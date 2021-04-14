@@ -12,8 +12,8 @@ public class ResolveUseCase {
         this.hanoiRepository = hanoiRepository;
     }
     
-    public void invoke(State initialState, Callback callback) {
-        this.hanoiRepository.resolve(initialState, callback);
+    public void invoke(State initialState, int numberOfDisks, Callback callback) {
+        this.hanoiRepository.resolve(initialState, numberOfDisks, callback);
     }
     
 }
