@@ -2,7 +2,8 @@ package towerofhanoiia.usecases;
 
 import towerofhanoiia.data.Callback;
 import towerofhanoiia.data.HanoiRepository;
-import towerofhanoiia.data.domain.State;
+import towerofhanoiia.data.domain.Answer;
+import towerofhanoiia.data.domain.Instance;
 
 
 public class ResolveUseCase {
@@ -12,8 +13,8 @@ public class ResolveUseCase {
         this.hanoiRepository = hanoiRepository;
     }
     
-    public void invoke(State initialState, int numberOfDisks, Callback callback) {
-        this.hanoiRepository.resolve(initialState, numberOfDisks, callback);
+    public void invoke(Instance instance, Callback<Answer> callback) {
+        this.hanoiRepository.resolve(instance, callback);
     }
     
 }

@@ -4,19 +4,22 @@ import java.util.ArrayList;
 
 public class Answer {
     private boolean hasAnswer;
+    private Instance instance;
     private ArrayList<State> way;
 
-    public Answer(boolean hasAnswer, ArrayList<State> way) {
+    public Answer(boolean hasAnswer,Instance instance, ArrayList<State> way) {
         this.hasAnswer = hasAnswer;
+        this.instance = instance;
         this.way = way;
     }
     
     public Answer() {
         this.hasAnswer = false;
         this.way = new ArrayList();
+        this.instance = new Instance();
     }
 
-    public boolean isHasAnswer() {
+    public boolean hasAnswer() {
         return hasAnswer;
     }
 
@@ -30,6 +33,14 @@ public class Answer {
 
     public void setWay(ArrayList<State> way) {
         this.way = way;
+    }
+
+    public Instance getInstance() {
+        return instance;
+    }
+
+    public void setInstance(Instance instance) {
+        this.instance = instance;
     }
     
 }

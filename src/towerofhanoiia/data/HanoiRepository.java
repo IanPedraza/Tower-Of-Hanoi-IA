@@ -1,7 +1,7 @@
 package towerofhanoiia.data;
 
 import towerofhanoiia.data.domain.Answer;
-import towerofhanoiia.data.domain.State;
+import towerofhanoiia.data.domain.Instance;
 
 public class HanoiRepository {
     private final HanoiLocalDataSource localDataSource;
@@ -10,8 +10,8 @@ public class HanoiRepository {
         this.localDataSource = localDataSource;
     }
     
-    public void resolve(State initialState, int numberOfDisks, Callback<Answer> callback) {
-        this.localDataSource.resolve(initialState, numberOfDisks, callback);
+    public void resolve(Instance instance, Callback<Answer> callback) {
+        this.localDataSource.resolve(instance, callback);
     }
     
 }

@@ -1,21 +1,69 @@
 package towerofhanoiia;
 
+import javax.swing.JOptionPane;
+import towerofhanoiia.data.Callback;
+import towerofhanoiia.data.HanoiLocalDataSource;
 import towerofhanoiia.data.HanoiRepository;
+import towerofhanoiia.data.domain.Answer;
+import towerofhanoiia.data.domain.Instance;
+import towerofhanoiia.data.domain.SearchMethod;
+import towerofhanoiia.data.domain.SearchMethods;
+import towerofhanoiia.data.domain.State;
 import towerofhanoiia.framework.LispDataSource;
 import towerofhanoiia.usecases.ResolveUseCase;
 
-public class Main extends javax.swing.JFrame {
 
-    private final LispDataSource lispDataSource;
+public class Main extends javax.swing.JFrame implements Callback<Answer> {
+
+    private HanoiLocalDataSource hanoiLocalDataSource;
     private final HanoiRepository hanoiRepository;
     private final ResolveUseCase resolveUseCase;
     
     public Main() {
-        this.lispDataSource = new LispDataSource();
-        this.hanoiRepository = new HanoiRepository(lispDataSource);
-        this.resolveUseCase = new ResolveUseCase(hanoiRepository);
+        this.hanoiLocalDataSource = new LispDataSource();
+        this.hanoiRepository = new HanoiRepository(hanoiLocalDataSource);
+        this.resolveUseCase = new ResolveUseCase(hanoiRepository);   
         
         initComponents();
+        initAlgorithms();
+    }
+    
+    private void initAlgorithms() {
+        for (SearchMethod method : SearchMethods.methods) {
+            this.cbAlgorithms.addItem(method);
+        }
+    }
+    
+    private void instanceSearchMethod(SearchMethod method) {
+        this.hanoiLocalDataSource =  new LispDataSource();
+    }
+    
+    private Instance getInstance() {
+        try {
+            SearchMethod selectedAlgorithm = (SearchMethod) this.cbAlgorithms.getSelectedItem();
+            this.instanceSearchMethod(selectedAlgorithm);
+            
+            int numberOfDisks = Integer.parseInt(this.cbNumberOfDisks.getSelectedItem().toString());
+            String initialTower = this.cbInitialTower.getSelectedItem().toString();
+            
+            State initialState = new State();
+            initialState.instanceInitialTower(initialTower, numberOfDisks);
+            
+            return new Instance(initialState, numberOfDisks, initialTower);
+        } catch(Exception e) {
+            return null;
+        }
+    }
+    
+    
+    @Override
+    public void onSuccess(Answer result) {
+        this.taConsole.append(result.toString());
+    }
+
+    @Override
+    public void onFailed(Exception error) {
+        JOptionPane.showMessageDialog(this, "Error");
     }
 
     @SuppressWarnings("unchecked")
@@ -25,20 +73,26 @@ public class Main extends javax.swing.JFrame {
         menuBar = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenu2 = new javax.swing.JMenu();
-        buttonGroupAlgorithms = new javax.swing.ButtonGroup();
-        buttonGroupAlgorithms1 = new javax.swing.ButtonGroup();
-        jPanel1 = new javax.swing.JPanel();
-        jLabel1 = new javax.swing.JLabel();
-        jRadioButton1 = new javax.swing.JRadioButton();
-        jRadioButton4 = new javax.swing.JRadioButton();
-        jLabel2 = new javax.swing.JLabel();
-        jComboBox1 = new javax.swing.JComboBox();
         jScrollPane1 = new javax.swing.JScrollPane();
-        textAreaConsole = new javax.swing.JTextArea();
+        taConsole = new javax.swing.JTextArea();
         jPanel2 = new javax.swing.JPanel();
         jButton2 = new javax.swing.JButton();
         jToolBar1 = new javax.swing.JToolBar();
         jButton1 = new javax.swing.JButton();
+        jSeparator1 = new javax.swing.JToolBar.Separator();
+        jLabel1 = new javax.swing.JLabel();
+        jSeparator4 = new javax.swing.JToolBar.Separator();
+        cbAlgorithms = new javax.swing.JComboBox();
+        jSeparator2 = new javax.swing.JToolBar.Separator();
+        jLabel2 = new javax.swing.JLabel();
+        jSeparator3 = new javax.swing.JToolBar.Separator();
+        cbNumberOfDisks = new javax.swing.JComboBox();
+        jSeparator5 = new javax.swing.JToolBar.Separator();
+        jLabel3 = new javax.swing.JLabel();
+        jSeparator6 = new javax.swing.JToolBar.Separator();
+        cbInitialTower = new javax.swing.JComboBox();
+        jPanel1 = new javax.swing.JPanel();
+        jLabel4 = new javax.swing.JLabel();
         jMenuBar2 = new javax.swing.JMenuBar();
         jMenu4 = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
@@ -50,71 +104,17 @@ public class Main extends javax.swing.JFrame {
         menuBar.add(jMenu2);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setTitle("Tower Of Hanoi - AI");
         setBackground(new java.awt.Color(255, 255, 255));
-
-        jLabel1.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jLabel1.setText("Type of seacrh");
-
-        buttonGroupAlgorithms.add(jRadioButton1);
-        jRadioButton1.setText("Deepth Search");
-        jRadioButton1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jRadioButton1ActionPerformed(evt);
-            }
-        });
-
-        buttonGroupAlgorithms.add(jRadioButton4);
-        jRadioButton4.setText("A Star Search");
-        jRadioButton4.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jRadioButton4ActionPerformed(evt);
-            }
-        });
-
-        jLabel2.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jLabel2.setText("Number of disks");
-
-        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "5", "7", "11" }));
-
-        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
-        jPanel1.setLayout(jPanel1Layout);
-        jPanel1Layout.setHorizontalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jRadioButton1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jRadioButton4, javax.swing.GroupLayout.DEFAULT_SIZE, 188, Short.MAX_VALUE)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jComboBox1, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap())
-        );
-        jPanel1Layout.setVerticalGroup(
-            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
-                .addGap(20, 20, 20)
-                .addComponent(jLabel1)
-                .addGap(18, 18, 18)
-                .addComponent(jRadioButton1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jRadioButton4)
-                .addGap(78, 78, 78)
-                .addComponent(jLabel2)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(289, Short.MAX_VALUE))
-        );
 
         jScrollPane1.setBackground(new java.awt.Color(255, 255, 255));
 
-        textAreaConsole.setEditable(false);
-        textAreaConsole.setBackground(new java.awt.Color(255, 255, 255));
-        textAreaConsole.setColumns(20);
-        textAreaConsole.setFont(new java.awt.Font("Consolas", 0, 14)); // NOI18N
-        textAreaConsole.setRows(5);
-        textAreaConsole.setText("Hello World");
-        jScrollPane1.setViewportView(textAreaConsole);
+        taConsole.setEditable(false);
+        taConsole.setBackground(new java.awt.Color(255, 255, 255));
+        taConsole.setColumns(20);
+        taConsole.setFont(new java.awt.Font("Consolas", 0, 14)); // NOI18N
+        taConsole.setRows(5);
+        jScrollPane1.setViewportView(taConsole);
 
         jPanel2.setBackground(new java.awt.Color(255, 255, 255));
 
@@ -139,9 +139,10 @@ public class Main extends javax.swing.JFrame {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jButton2)
-                .addContainerGap(407, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
+        jToolBar1.setFloatable(false);
         jToolBar1.setRollover(true);
 
         jButton1.setText("Run");
@@ -154,6 +155,51 @@ public class Main extends javax.swing.JFrame {
             }
         });
         jToolBar1.add(jButton1);
+        jToolBar1.add(jSeparator1);
+
+        jLabel1.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        jLabel1.setText("Seacrh:");
+        jToolBar1.add(jLabel1);
+        jToolBar1.add(jSeparator4);
+
+        jToolBar1.add(cbAlgorithms);
+        jToolBar1.add(jSeparator2);
+
+        jLabel2.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        jLabel2.setText("Number of disks:");
+        jToolBar1.add(jLabel2);
+        jToolBar1.add(jSeparator3);
+
+        cbNumberOfDisks.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "5", "7", "11" }));
+        jToolBar1.add(cbNumberOfDisks);
+        jToolBar1.add(jSeparator5);
+
+        jLabel3.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        jLabel3.setText("Initial Tower:");
+        jToolBar1.add(jLabel3);
+        jToolBar1.add(jSeparator6);
+
+        cbInitialTower.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "A", "B", "C" }));
+        jToolBar1.add(cbInitialTower);
+
+        jLabel4.setText("Data");
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jLabel4)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                .addContainerGap(8, Short.MAX_VALUE)
+                .addComponent(jLabel4)
+                .addContainerGap())
+        );
 
         jMenuBar2.setBackground(new java.awt.Color(255, 255, 255));
 
@@ -173,13 +219,12 @@ public class Main extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, 930, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 724, Short.MAX_VALUE)
-                            .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))))
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 238, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -187,36 +232,32 @@ public class Main extends javax.swing.JFrame {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 509, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jRadioButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton1ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jRadioButton1ActionPerformed
-
-    private void jRadioButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jRadioButton4ActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_jRadioButton4ActionPerformed
-
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
+        Instance instance = this.getInstance();
+        
+        if (instance != null) {
+            resolveUseCase.invoke(instance, this);
+        }
+        
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        // TODO add your handling code here:
+        // TODO: Play animation
     }//GEN-LAST:event_jButton2ActionPerformed
 
-   
+    
     public static void main(String args[]) {
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
@@ -243,13 +284,15 @@ public class Main extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.ButtonGroup buttonGroupAlgorithms;
-    private javax.swing.ButtonGroup buttonGroupAlgorithms1;
+    private javax.swing.JComboBox cbAlgorithms;
+    private javax.swing.JComboBox cbInitialTower;
+    private javax.swing.JComboBox cbNumberOfDisks;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
-    private javax.swing.JComboBox jComboBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu4;
@@ -257,11 +300,16 @@ public class Main extends javax.swing.JFrame {
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JRadioButton jRadioButton1;
-    private javax.swing.JRadioButton jRadioButton4;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JToolBar.Separator jSeparator1;
+    private javax.swing.JToolBar.Separator jSeparator2;
+    private javax.swing.JToolBar.Separator jSeparator3;
+    private javax.swing.JToolBar.Separator jSeparator4;
+    private javax.swing.JToolBar.Separator jSeparator5;
+    private javax.swing.JToolBar.Separator jSeparator6;
     private javax.swing.JToolBar jToolBar1;
     private javax.swing.JMenuBar menuBar;
-    private javax.swing.JTextArea textAreaConsole;
+    private javax.swing.JTextArea taConsole;
     // End of variables declaration//GEN-END:variables
+
 }
