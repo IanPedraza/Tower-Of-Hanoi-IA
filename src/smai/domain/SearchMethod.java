@@ -1,4 +1,4 @@
-package towerofhanoiia.data.domain;
+package smai.domain;
 
 public class SearchMethod {
     private int key;

@@ -1,4 +1,4 @@
-package towerofhanoiia.data;
+package smai.common.utils;
 
 public interface Callback<T> {
     public void onSuccess(T result);

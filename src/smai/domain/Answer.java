@@ -1,4 +1,4 @@
-package towerofhanoiia.data.domain;
+package smai.domain;
 
 import java.util.ArrayList;
 
@@ -7,7 +7,7 @@ public class Answer {
     private Instance instance;
     private ArrayList<State> way;
 
-    public Answer(boolean hasAnswer,Instance instance, ArrayList<State> way) {
+    public Answer(boolean hasAnswer, Instance instance, ArrayList<State> way) {
         this.hasAnswer = hasAnswer;
         this.instance = instance;
         this.way = way;
@@ -16,7 +16,7 @@ public class Answer {
     public Answer() {
         this.hasAnswer = false;
         this.way = new ArrayList();
-        this.instance = new Instance();
+        this.instance = null;
     }
 
     public boolean hasAnswer() {

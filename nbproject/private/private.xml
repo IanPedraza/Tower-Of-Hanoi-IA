@@ -3,11 +3,9 @@
     <editor-bookmarks xmlns="http://www.netbeans.org/ns/editor-bookmarks/2" lastBookmarkId="0"/>
     <open-files xmlns="http://www.netbeans.org/ns/projectui-open-files/2">
         <group>
-            <file>file:/C:/Users/ianpe/Documents/NetBeansProjects/TowerOfHanoiIA/src/towerofhanoiia/data/HanoiLocalDataSource.java</file>
-            <file>file:/C:/Users/ianpe/Documents/NetBeansProjects/TowerOfHanoiIA/src/towerofhanoiia/usecases/ResolveUseCase.java</file>
-            <file>file:/C:/Users/ianpe/Documents/NetBeansProjects/TowerOfHanoiIA/src/towerofhanoiia/Main.java</file>
-            <file>file:/C:/Users/ianpe/Documents/NetBeansProjects/TowerOfHanoiIA/src/towerofhanoiia/framework/LispDataSource.java</file>
-            <file>file:/C:/Users/ianpe/Documents/NetBeansProjects/TowerOfHanoiIA/src/towerofhanoiia/data/HanoiRepository.java</file>
+            <file>file:/C:/Users/ianpe/Documents/NetBeansProjects/TowerOfHanoiIA/src/smai/framework/hanoi/HanoiAnimatorDataSource.java</file>
+            <file>file:/C:/Users/ianpe/Documents/NetBeansProjects/TowerOfHanoiIA/src/smai/data/DepthSearchDataSource.java</file>
+            <file>file:/C:/Users/ianpe/Documents/NetBeansProjects/TowerOfHanoiIA/src/smai/Main.java</file>
         </group>
     </open-files>
 </project-private>

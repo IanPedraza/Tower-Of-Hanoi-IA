@@ -1,4 +1,6 @@
-package towerofhanoiia.data.domain;
+package smai.common.utils;
+
+import smai.domain.SearchMethod;
 
 public class SearchMethods {
     

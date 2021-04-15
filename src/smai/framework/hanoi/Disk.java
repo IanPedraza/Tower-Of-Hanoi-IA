@@ -1,4 +1,4 @@
-package towerofhanoiia.data.domain;
+package smai.framework.hanoi;
 
 public class Disk {
     private final int numberOfDisk;

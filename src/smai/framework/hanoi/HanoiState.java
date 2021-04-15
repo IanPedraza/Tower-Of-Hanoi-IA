@@ -1,46 +1,41 @@
-package towerofhanoiia.data.domain;
+package smai.framework.hanoi;
 
+import smai.domain.State;
 
-public class State {
-    
+public class HanoiState implements State {
+
     private Tower aTower, bTower, cTower;
-    
-    public State() {
+
+    public HanoiState() {
         this.aTower = new Tower();
         this.bTower = new Tower();
         this.cTower = new Tower();
     }
 
-    public State(Tower aTower, Tower bTower, Tower cTower) {
+    public HanoiState(Tower aTower, Tower bTower, Tower cTower) {
         this.aTower = aTower;
         this.bTower = bTower;
         this.cTower = cTower;
     }
-    
-    public boolean instanceInitialTower(String tower, int numberOfDisks) {
-        Tower auxTower;
-        
-        switch (tower.toLowerCase()){
+
+    public boolean instanceTower(String tower, int numberOfDisks) {
+        switch (tower.toLowerCase()) {
             case "a":
-                auxTower = this.aTower;
+                this.aTower.fill(numberOfDisks);
                 break;
-                
+
             case "b":
-                auxTower = this.bTower;
+                this.bTower.fill(numberOfDisks);
                 break;
-                
+
             case "c":
-                auxTower = this.cTower;
+                this.cTower.fill(numberOfDisks);
                 break;
-                
+
             default:
                 return false;
         }
-        
-        for (int index = 1; index <= numberOfDisks; index++) {
-            auxTower.addDisk(new Disk(index));
-        }
-        
+
         return true;
     }
 
@@ -67,5 +62,11 @@ public class State {
     public void setcTower(Tower cTower) {
         this.cTower = cTower;
     }
-    
+
+    @Override
+    public State nextState() {
+        // TODO: Next state
+        return null;
+    }
+
 }

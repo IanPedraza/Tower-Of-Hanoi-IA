@@ -1,1 +1,1 @@
-# Tower-Of-Hanoi-IA
+# Tower-Of-Hanoi-AI

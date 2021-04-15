@@ -1,28 +1,43 @@
-package towerofhanoiia;
+package smai;
 
 import javax.swing.JOptionPane;
-import towerofhanoiia.data.Callback;
-import towerofhanoiia.data.HanoiLocalDataSource;
-import towerofhanoiia.data.HanoiRepository;
-import towerofhanoiia.data.domain.Answer;
-import towerofhanoiia.data.domain.Instance;
-import towerofhanoiia.data.domain.SearchMethod;
-import towerofhanoiia.data.domain.SearchMethods;
-import towerofhanoiia.data.domain.State;
-import towerofhanoiia.framework.LispDataSource;
-import towerofhanoiia.usecases.ResolveUseCase;
+import smai.common.utils.Callback;
+import smai.data.AnimationDataSource;
+import smai.data.AnimationRepository;
+import smai.data.SearchLocalDataSource;
+import smai.data.SearchMethodsRepository;
+import smai.domain.Answer;
+import smai.domain.Instance;
+import smai.framework.hanoi.HanoiInstance;
+import smai.domain.SearchMethod;
+import smai.common.utils.SearchMethods;
+import smai.framework.hanoi.HanoiAnimatorDataSource;
+import smai.framework.hanoi.HanoiState;
+import smai.data.DepthSearchDataSource;
+import smai.usecases.AnimateUseCase;
+import smai.usecases.ResolveUseCase;
 
 
 public class Main extends javax.swing.JFrame implements Callback<Answer> {
 
-    private HanoiLocalDataSource hanoiLocalDataSource;
-    private final HanoiRepository hanoiRepository;
+    private SearchLocalDataSource localDataSource;
+    private final SearchMethodsRepository searchRepository;
     private final ResolveUseCase resolveUseCase;
     
+    private AnimationDataSource animatorDataSource;
+    private final AnimationRepository animationRepository;
+    private final AnimateUseCase animateUseCase;
+    
+    private Answer answer = null;
+    
     public Main() {
-        this.hanoiLocalDataSource = new LispDataSource();
-        this.hanoiRepository = new HanoiRepository(hanoiLocalDataSource);
-        this.resolveUseCase = new ResolveUseCase(hanoiRepository);   
+        this.localDataSource = new DepthSearchDataSource();
+        this.searchRepository = new SearchMethodsRepository(localDataSource);
+        this.resolveUseCase = new ResolveUseCase(searchRepository);   
+                
+        this.animatorDataSource = new HanoiAnimatorDataSource();
+        this.animationRepository = new AnimationRepository(animatorDataSource);
+        this.animateUseCase = new AnimateUseCase(animationRepository);
         
         initComponents();
         initAlgorithms();
@@ -30,26 +45,33 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
     
     private void initAlgorithms() {
         for (SearchMethod method : SearchMethods.methods) {
-            this.cbAlgorithms.addItem(method);
+            this.cbSearchMethods.addItem(method);
         }
     }
     
     private void instanceSearchMethod(SearchMethod method) {
-        this.hanoiLocalDataSource =  new LispDataSource();
+        this.localDataSource =  new DepthSearchDataSource();
+        this.animatorDataSource = new HanoiAnimatorDataSource();
     }
     
     private Instance getInstance() {
         try {
-            SearchMethod selectedAlgorithm = (SearchMethod) this.cbAlgorithms.getSelectedItem();
-            this.instanceSearchMethod(selectedAlgorithm);
+            SearchMethod selectedMethods = (SearchMethod) this.cbSearchMethods.getSelectedItem();
+            this.instanceSearchMethod(selectedMethods);
             
             int numberOfDisks = Integer.parseInt(this.cbNumberOfDisks.getSelectedItem().toString());
             String initialTower = this.cbInitialTower.getSelectedItem().toString();
+            String targetTower = this.cbTargetTower.getSelectedItem().toString();
             
-            State initialState = new State();
-            initialState.instanceInitialTower(initialTower, numberOfDisks);
+            HanoiState initialState = new HanoiState();
+            HanoiState targetState = new HanoiState();
             
-            return new Instance(initialState, numberOfDisks, initialTower);
+            if (initialState.instanceTower(initialTower, numberOfDisks) && initialState.instanceTower(targetTower, numberOfDisks)) {
+                return new HanoiInstance(initialState, targetState, numberOfDisks);
+            } else {
+                return null;
+            }
+            
         } catch(Exception e) {
             return null;
         }
@@ -58,6 +80,7 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
     
     @Override
     public void onSuccess(Answer result) {
+        this.answer = result;
         this.taConsole.append(result.toString());
     }
 
@@ -75,14 +98,14 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
         jMenu2 = new javax.swing.JMenu();
         jScrollPane1 = new javax.swing.JScrollPane();
         taConsole = new javax.swing.JTextArea();
-        jPanel2 = new javax.swing.JPanel();
+        jpAnimation = new javax.swing.JPanel();
         jButton2 = new javax.swing.JButton();
         jToolBar1 = new javax.swing.JToolBar();
         jButton1 = new javax.swing.JButton();
         jSeparator1 = new javax.swing.JToolBar.Separator();
         jLabel1 = new javax.swing.JLabel();
         jSeparator4 = new javax.swing.JToolBar.Separator();
-        cbAlgorithms = new javax.swing.JComboBox();
+        cbSearchMethods = new javax.swing.JComboBox();
         jSeparator2 = new javax.swing.JToolBar.Separator();
         jLabel2 = new javax.swing.JLabel();
         jSeparator3 = new javax.swing.JToolBar.Separator();
@@ -91,6 +114,10 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
         jLabel3 = new javax.swing.JLabel();
         jSeparator6 = new javax.swing.JToolBar.Separator();
         cbInitialTower = new javax.swing.JComboBox();
+        jSeparator7 = new javax.swing.JToolBar.Separator();
+        jLabel5 = new javax.swing.JLabel();
+        jSeparator8 = new javax.swing.JToolBar.Separator();
+        cbTargetTower = new javax.swing.JComboBox();
         jPanel1 = new javax.swing.JPanel();
         jLabel4 = new javax.swing.JLabel();
         jMenuBar2 = new javax.swing.JMenuBar();
@@ -105,7 +132,6 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Tower Of Hanoi - AI");
-        setBackground(new java.awt.Color(255, 255, 255));
 
         jScrollPane1.setBackground(new java.awt.Color(255, 255, 255));
 
@@ -116,7 +142,8 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
         taConsole.setRows(5);
         jScrollPane1.setViewportView(taConsole);
 
-        jPanel2.setBackground(new java.awt.Color(255, 255, 255));
+        jpAnimation.setBackground(new java.awt.Color(255, 255, 255));
+        jpAnimation.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(153, 153, 153)));
 
         jButton2.setText("Play");
         jButton2.addActionListener(new java.awt.event.ActionListener() {
@@ -125,18 +152,18 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
             }
         });
 
-        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
-        jPanel2.setLayout(jPanel2Layout);
-        jPanel2Layout.setHorizontalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+        javax.swing.GroupLayout jpAnimationLayout = new javax.swing.GroupLayout(jpAnimation);
+        jpAnimation.setLayout(jpAnimationLayout);
+        jpAnimationLayout.setHorizontalGroup(
+            jpAnimationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jpAnimationLayout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jButton2)
                 .addContainerGap())
         );
-        jPanel2Layout.setVerticalGroup(
-            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel2Layout.createSequentialGroup()
+        jpAnimationLayout.setVerticalGroup(
+            jpAnimationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jpAnimationLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jButton2)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -158,11 +185,11 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
         jToolBar1.add(jSeparator1);
 
         jLabel1.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jLabel1.setText("Seacrh:");
+        jLabel1.setText("Search Method:");
         jToolBar1.add(jLabel1);
         jToolBar1.add(jSeparator4);
 
-        jToolBar1.add(cbAlgorithms);
+        jToolBar1.add(cbSearchMethods);
         jToolBar1.add(jSeparator2);
 
         jLabel2.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
@@ -170,7 +197,7 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
         jToolBar1.add(jLabel2);
         jToolBar1.add(jSeparator3);
 
-        cbNumberOfDisks.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "5", "7", "11" }));
+        cbNumberOfDisks.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "6", "10", "11" }));
         jToolBar1.add(cbNumberOfDisks);
         jToolBar1.add(jSeparator5);
 
@@ -181,6 +208,15 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
 
         cbInitialTower.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "A", "B", "C" }));
         jToolBar1.add(cbInitialTower);
+        jToolBar1.add(jSeparator7);
+
+        jLabel5.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        jLabel5.setText("Target Tower:");
+        jToolBar1.add(jLabel5);
+        jToolBar1.add(jSeparator8);
+
+        cbTargetTower.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "A", "B", "C" }));
+        jToolBar1.add(cbTargetTower);
 
         jLabel4.setText("Data");
 
@@ -222,7 +258,7 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, 930, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jpAnimation, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 238, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
@@ -234,7 +270,7 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
                 .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jpAnimation, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 509, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -245,7 +281,7 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        Instance instance = this.getInstance();
+        HanoiInstance instance = (HanoiInstance) this.getInstance();
         
         if (instance != null) {
             resolveUseCase.invoke(instance, this);
@@ -254,7 +290,9 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        // TODO: Play animation
+        if (this.answer != null) {
+            animateUseCase.invoke(this.answer, this.jpAnimation);
+        }
     }//GEN-LAST:event_jButton2ActionPerformed
 
     
@@ -284,22 +322,23 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JComboBox cbAlgorithms;
     private javax.swing.JComboBox cbInitialTower;
     private javax.swing.JComboBox cbNumberOfDisks;
+    private javax.swing.JComboBox cbSearchMethods;
+    private javax.swing.JComboBox cbTargetTower;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenu jMenu4;
     private javax.swing.JMenuBar jMenuBar2;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JPanel jPanel1;
-    private javax.swing.JPanel jPanel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JToolBar.Separator jSeparator1;
     private javax.swing.JToolBar.Separator jSeparator2;
@@ -307,7 +346,10 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
     private javax.swing.JToolBar.Separator jSeparator4;
     private javax.swing.JToolBar.Separator jSeparator5;
     private javax.swing.JToolBar.Separator jSeparator6;
+    private javax.swing.JToolBar.Separator jSeparator7;
+    private javax.swing.JToolBar.Separator jSeparator8;
     private javax.swing.JToolBar jToolBar1;
+    private javax.swing.JPanel jpAnimation;
     private javax.swing.JMenuBar menuBar;
     private javax.swing.JTextArea taConsole;
     // End of variables declaration//GEN-END:variables
