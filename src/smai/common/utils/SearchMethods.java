@@ -1,15 +1,14 @@
 package smai.common.utils;
 
-import smai.domain.SearchMethod;
-
 public class SearchMethods {
     
-    public static final SearchMethod[] methods = {
-        new SearchMethod(SearchMethods.DEPTH, "Depth Search"),
-        new SearchMethod(SearchMethods.A_STAR, "A Start"),
+    public static final SearchMethodItem[] METHODS = {
+        new SearchMethodItem(SearchMethods.DEPTH, "Depth-first search"),
+        new SearchMethodItem(SearchMethods.BREADTH, "Breadth-first search"),
+        //new SearchMethodItem(SearchMethods.A_STAR, "A Start"),
     };
     
-    public static int DEPTH = 0;
-    public static int A_STAR = 1;
-    
+    public static final int DEPTH = 0;
+    public static final int BREADTH = 1;    
+    public static final int A_STAR = 2;    
 }

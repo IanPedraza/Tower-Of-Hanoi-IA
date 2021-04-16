@@ -1,5 +1,5 @@
 package smai.domain;
 
-public interface State {
-    public State nextState();
+public interface State {    
+    public State clone();
 }

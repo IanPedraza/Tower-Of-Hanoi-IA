@@ -9,79 +9,124 @@ import smai.data.SearchMethodsRepository;
 import smai.domain.Answer;
 import smai.domain.Instance;
 import smai.framework.hanoi.HanoiInstance;
-import smai.domain.SearchMethod;
+import smai.common.utils.SearchMethodItem;
 import smai.common.utils.SearchMethods;
+import smai.data.BreadthSearchDataSource;
 import smai.framework.hanoi.HanoiAnimatorDataSource;
-import smai.framework.hanoi.HanoiState;
 import smai.data.DepthSearchDataSource;
+import smai.domain.State;
 import smai.usecases.AnimateUseCase;
 import smai.usecases.ResolveUseCase;
 
-
 public class Main extends javax.swing.JFrame implements Callback<Answer> {
 
-    private SearchLocalDataSource localDataSource;
-    private final SearchMethodsRepository searchRepository;
-    private final ResolveUseCase resolveUseCase;
-    
+    private SearchMethodsRepository searchRepository;
+    private ResolveUseCase resolveUseCase;
+
     private AnimationDataSource animatorDataSource;
-    private final AnimationRepository animationRepository;
-    private final AnimateUseCase animateUseCase;
-    
+    private AnimationRepository animationRepository;
+    private AnimateUseCase animateUseCase;
+
     private Answer answer = null;
-    
+
     public Main() {
-        this.localDataSource = new DepthSearchDataSource();
-        this.searchRepository = new SearchMethodsRepository(localDataSource);
-        this.resolveUseCase = new ResolveUseCase(searchRepository);   
-                
         this.animatorDataSource = new HanoiAnimatorDataSource();
         this.animationRepository = new AnimationRepository(animatorDataSource);
         this.animateUseCase = new AnimateUseCase(animationRepository);
-        
+
         initComponents();
         initAlgorithms();
     }
     
+    private void setMethod(SearchLocalDataSource localDataSource) {
+        this.searchRepository = new SearchMethodsRepository(localDataSource);
+        this.resolveUseCase = new ResolveUseCase(searchRepository);
+    }
+
     private void initAlgorithms() {
-        for (SearchMethod method : SearchMethods.methods) {
+        for (SearchMethodItem method : SearchMethods.METHODS) {
             this.cbSearchMethods.addItem(method);
         }
+        
+        instanceSearchMethod(SearchMethods.METHODS[0]);
     }
-    
-    private void instanceSearchMethod(SearchMethod method) {
-        this.localDataSource =  new DepthSearchDataSource();
-        this.animatorDataSource = new HanoiAnimatorDataSource();
+
+    private void instanceSearchMethod(SearchMethodItem method) {
+        switch (method.getKey()) {
+            case SearchMethods.DEPTH:
+                this.setMethod(new DepthSearchDataSource());
+                break;
+
+            case SearchMethods.BREADTH:
+                this.setMethod( new BreadthSearchDataSource());
+                break;
+
+            default:
+                this.setMethod(new DepthSearchDataSource());
+        }
     }
-    
+
     private Instance getInstance() {
         try {
-            SearchMethod selectedMethods = (SearchMethod) this.cbSearchMethods.getSelectedItem();
+            SearchMethodItem selectedMethods = (SearchMethodItem) this.cbSearchMethods.getSelectedItem();
             this.instanceSearchMethod(selectedMethods);
-            
+
             int numberOfDisks = Integer.parseInt(this.cbNumberOfDisks.getSelectedItem().toString());
-            String initialTower = this.cbInitialTower.getSelectedItem().toString();
-            String targetTower = this.cbTargetTower.getSelectedItem().toString();
-            
-            HanoiState initialState = new HanoiState();
-            HanoiState targetState = new HanoiState();
-            
-            if (initialState.instanceTower(initialTower, numberOfDisks) && initialState.instanceTower(targetTower, numberOfDisks)) {
-                return new HanoiInstance(initialState, targetState, numberOfDisks);
-            } else {
-                return null;
-            }
-            
-        } catch(Exception e) {
+
+            return new HanoiInstance(numberOfDisks);
+        } catch (Exception e) {
             return null;
         }
     }
+
+    private void cleanConsole() {
+        this.taConsole.setText(null);
+    }
     
+    private void run() {
+        HanoiInstance instance = (HanoiInstance) this.getInstance();
+
+        if (instance != null) {
+            this.taConsole.append("Loading...\n");
+            resolveUseCase.invoke(instance, this);
+        } else {
+            this.taConsole.append("Error...\n");
+        }
+        
+    }
     
+    private void closeWindow() {
+        this.dispose();
+    }
+    
+    private void playAnimation() {
+        if (this.answer != null) {
+            animateUseCase.invoke(this.answer, this.jpAnimation);
+        }
+    }
+
     @Override
     public void onSuccess(Answer result) {
+        if (result == null) {
+            this.taConsole.append("Something went grown, please try again.");
+            return;
+        }
+
         this.answer = result;
-        this.taConsole.append(result.toString());
+
+        for (State state : result.getWay()) {
+            this.taConsole.append(state.toString());
+            this.taConsole.append("\n");
+        }
+
+        if (answer.hasAnswer()) {
+            this.taConsole.append("Solved success.\n");
+        } else {
+            this.taConsole.append("No solution found.\n");
+        }
+        
+        this.taConsole.append(answer.getElapsedTime() + " ms");
+        this.taConsole.append("\n");
     }
 
     @Override
@@ -99,9 +144,10 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
         jScrollPane1 = new javax.swing.JScrollPane();
         taConsole = new javax.swing.JTextArea();
         jpAnimation = new javax.swing.JPanel();
-        jButton2 = new javax.swing.JButton();
+        btnPlay = new javax.swing.JButton();
         jToolBar1 = new javax.swing.JToolBar();
-        jButton1 = new javax.swing.JButton();
+        btnRun = new javax.swing.JButton();
+        btnCleanConsole = new javax.swing.JButton();
         jSeparator1 = new javax.swing.JToolBar.Separator();
         jLabel1 = new javax.swing.JLabel();
         jSeparator4 = new javax.swing.JToolBar.Separator();
@@ -110,19 +156,14 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
         jLabel2 = new javax.swing.JLabel();
         jSeparator3 = new javax.swing.JToolBar.Separator();
         cbNumberOfDisks = new javax.swing.JComboBox();
-        jSeparator5 = new javax.swing.JToolBar.Separator();
-        jLabel3 = new javax.swing.JLabel();
-        jSeparator6 = new javax.swing.JToolBar.Separator();
-        cbInitialTower = new javax.swing.JComboBox();
-        jSeparator7 = new javax.swing.JToolBar.Separator();
-        jLabel5 = new javax.swing.JLabel();
-        jSeparator8 = new javax.swing.JToolBar.Separator();
-        cbTargetTower = new javax.swing.JComboBox();
         jPanel1 = new javax.swing.JPanel();
         jLabel4 = new javax.swing.JLabel();
         jMenuBar2 = new javax.swing.JMenuBar();
-        jMenu4 = new javax.swing.JMenu();
+        jMenu3 = new javax.swing.JMenu();
         jMenuItem1 = new javax.swing.JMenuItem();
+        miCleanConsole = new javax.swing.JMenuItem();
+        jMenu4 = new javax.swing.JMenu();
+        miExit = new javax.swing.JMenuItem();
 
         jMenu1.setText("File");
         menuBar.add(jMenu1);
@@ -145,10 +186,10 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
         jpAnimation.setBackground(new java.awt.Color(255, 255, 255));
         jpAnimation.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(153, 153, 153)));
 
-        jButton2.setText("Play");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
+        btnPlay.setText("Play");
+        btnPlay.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+                btnPlayActionPerformed(evt);
             }
         });
 
@@ -158,30 +199,41 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
             jpAnimationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jpAnimationLayout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(jButton2)
+                .addComponent(btnPlay)
                 .addContainerGap())
         );
         jpAnimationLayout.setVerticalGroup(
             jpAnimationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jpAnimationLayout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jButton2)
+                .addComponent(btnPlay)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jToolBar1.setFloatable(false);
         jToolBar1.setRollover(true);
 
-        jButton1.setText("Run");
-        jButton1.setFocusable(false);
-        jButton1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jButton1.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        btnRun.setText("Run");
+        btnRun.setFocusable(false);
+        btnRun.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnRun.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnRun.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                btnRunActionPerformed(evt);
             }
         });
-        jToolBar1.add(jButton1);
+        jToolBar1.add(btnRun);
+
+        btnCleanConsole.setText("Clean Console");
+        btnCleanConsole.setFocusable(false);
+        btnCleanConsole.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnCleanConsole.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnCleanConsole.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnCleanConsoleActionPerformed(evt);
+            }
+        });
+        jToolBar1.add(btnCleanConsole);
         jToolBar1.add(jSeparator1);
 
         jLabel1.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
@@ -197,26 +249,8 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
         jToolBar1.add(jLabel2);
         jToolBar1.add(jSeparator3);
 
-        cbNumberOfDisks.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "6", "10", "11" }));
+        cbNumberOfDisks.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "2", "3", "6", "10", "11" }));
         jToolBar1.add(cbNumberOfDisks);
-        jToolBar1.add(jSeparator5);
-
-        jLabel3.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jLabel3.setText("Initial Tower:");
-        jToolBar1.add(jLabel3);
-        jToolBar1.add(jSeparator6);
-
-        cbInitialTower.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "A", "B", "C" }));
-        jToolBar1.add(cbInitialTower);
-        jToolBar1.add(jSeparator7);
-
-        jLabel5.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        jLabel5.setText("Target Tower:");
-        jToolBar1.add(jLabel5);
-        jToolBar1.add(jSeparator8);
-
-        cbTargetTower.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "A", "B", "C" }));
-        jToolBar1.add(cbTargetTower);
 
         jLabel4.setText("Data");
 
@@ -239,10 +273,38 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
 
         jMenuBar2.setBackground(new java.awt.Color(255, 255, 255));
 
+        jMenu3.setText("Run");
+
+        jMenuItem1.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_R, java.awt.event.InputEvent.CTRL_MASK));
+        jMenuItem1.setText("Run");
+        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem1ActionPerformed(evt);
+            }
+        });
+        jMenu3.add(jMenuItem1);
+
+        miCleanConsole.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_L, java.awt.event.InputEvent.CTRL_MASK));
+        miCleanConsole.setText("Clean Console");
+        miCleanConsole.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                miCleanConsoleActionPerformed(evt);
+            }
+        });
+        jMenu3.add(miCleanConsole);
+
+        jMenuBar2.add(jMenu3);
+
         jMenu4.setText("Window");
 
-        jMenuItem1.setText("Close");
-        jMenu4.add(jMenuItem1);
+        miExit.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F4, java.awt.event.InputEvent.ALT_MASK));
+        miExit.setText("Exit");
+        miExit.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                miExitActionPerformed(evt);
+            }
+        });
+        jMenu4.add(miExit);
 
         jMenuBar2.add(jMenu4);
 
@@ -280,22 +342,30 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        HanoiInstance instance = (HanoiInstance) this.getInstance();
-        
-        if (instance != null) {
-            resolveUseCase.invoke(instance, this);
-        }
-        
-    }//GEN-LAST:event_jButton1ActionPerformed
+    private void btnRunActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRunActionPerformed
+        this.run();
+    }//GEN-LAST:event_btnRunActionPerformed
 
-    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
-        if (this.answer != null) {
-            animateUseCase.invoke(this.answer, this.jpAnimation);
-        }
-    }//GEN-LAST:event_jButton2ActionPerformed
+    private void btnPlayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPlayActionPerformed
+       this.playAnimation();
+    }//GEN-LAST:event_btnPlayActionPerformed
 
-    
+    private void btnCleanConsoleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCleanConsoleActionPerformed
+        this.cleanConsole();
+    }//GEN-LAST:event_btnCleanConsoleActionPerformed
+
+    private void miCleanConsoleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miCleanConsoleActionPerformed
+        this.cleanConsole();
+    }//GEN-LAST:event_miCleanConsoleActionPerformed
+
+    private void miExitActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miExitActionPerformed
+        this.closeWindow();
+    }//GEN-LAST:event_miExitActionPerformed
+
+    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+        this.run();
+    }//GEN-LAST:event_jMenuItem1ActionPerformed
+
     public static void main(String args[]) {
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
@@ -313,7 +383,7 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(Main.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
-        
+
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new Main().setVisible(true);
@@ -322,19 +392,17 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JComboBox cbInitialTower;
+    private javax.swing.JButton btnCleanConsole;
+    private javax.swing.JButton btnPlay;
+    private javax.swing.JButton btnRun;
     private javax.swing.JComboBox cbNumberOfDisks;
     private javax.swing.JComboBox cbSearchMethods;
-    private javax.swing.JComboBox cbTargetTower;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
+    private javax.swing.JMenu jMenu3;
     private javax.swing.JMenu jMenu4;
     private javax.swing.JMenuBar jMenuBar2;
     private javax.swing.JMenuItem jMenuItem1;
@@ -344,13 +412,11 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
     private javax.swing.JToolBar.Separator jSeparator2;
     private javax.swing.JToolBar.Separator jSeparator3;
     private javax.swing.JToolBar.Separator jSeparator4;
-    private javax.swing.JToolBar.Separator jSeparator5;
-    private javax.swing.JToolBar.Separator jSeparator6;
-    private javax.swing.JToolBar.Separator jSeparator7;
-    private javax.swing.JToolBar.Separator jSeparator8;
     private javax.swing.JToolBar jToolBar1;
     private javax.swing.JPanel jpAnimation;
     private javax.swing.JMenuBar menuBar;
+    private javax.swing.JMenuItem miCleanConsole;
+    private javax.swing.JMenuItem miExit;
     private javax.swing.JTextArea taConsole;
     // End of variables declaration//GEN-END:variables
 

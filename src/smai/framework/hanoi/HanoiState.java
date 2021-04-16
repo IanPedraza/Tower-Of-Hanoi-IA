@@ -11,11 +11,18 @@ public class HanoiState implements State {
         this.bTower = new Tower();
         this.cTower = new Tower();
     }
+    
+    public HanoiState(HanoiState hanoiState) {
+        this.aTower = new Tower(hanoiState.getATower());
+        this.bTower = new Tower(hanoiState.getBTower());
+        this.cTower = new Tower(hanoiState.getCTower());
+    }
 
-    public HanoiState(Tower aTower, Tower bTower, Tower cTower) {
-        this.aTower = aTower;
-        this.bTower = bTower;
-        this.cTower = cTower;
+
+    public HanoiState(int disksOnA, int disksOnB, int disksOnC) {
+        this.aTower = new Tower(disksOnA);
+        this.bTower = new Tower(disksOnB);
+        this.cTower = new Tower(disksOnC);
     }
 
     public boolean instanceTower(String tower, int numberOfDisks) {
@@ -39,34 +46,56 @@ public class HanoiState implements State {
         return true;
     }
 
-    public Tower getaTower() {
+    public Tower getATower() {
         return aTower;
     }
 
-    public void setaTower(Tower aTower) {
+    public void setATower(Tower aTower) {
         this.aTower = aTower;
     }
 
-    public Tower getbTower() {
+    public Tower getBTower() {
         return bTower;
     }
 
-    public void setbTower(Tower bTower) {
+    public void setBTower(Tower bTower) {
         this.bTower = bTower;
     }
 
-    public Tower getcTower() {
+    public Tower getCTower() {
         return cTower;
     }
 
-    public void setcTower(Tower cTower) {
+    public void setCTower(Tower cTower) {
         this.cTower = cTower;
     }
 
     @Override
-    public State nextState() {
-        // TODO: Next state
-        return null;
+    public boolean equals(Object obj) {
+        if (obj instanceof HanoiState) {
+            HanoiState hanoiState = (HanoiState) obj;
+            
+            return this.aTower.equals(hanoiState.aTower) && 
+                    this.bTower.equals(hanoiState.bTower) && 
+                    this.cTower.equals(hanoiState.cTower);
+        }
+        
+        return false;
+    }    
+    
+
+    @Override
+    public String toString() {
+        return "(" + this.aTower + "), " +
+                "(" + this.bTower + "), " +
+                "(" + this.cTower + ")";
     }
 
+    @Override
+    public State clone()  {
+        return new HanoiState(this);
+    }
+    
+    
+    
 }

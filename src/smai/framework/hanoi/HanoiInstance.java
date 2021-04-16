@@ -8,12 +8,12 @@ public class HanoiInstance extends Instance {
     private int numberOfDisks;
 
     public HanoiInstance() {
-        super(new HanoiState(), new HanoiState());
+        super(new HanoiState(), new HanoiState(), HanoiOperators.OPERATORS);
         this.numberOfDisks = 0;
     }
 
-    public HanoiInstance(HanoiState initialState, HanoiState targetState, int numberOfDisks) {
-        super(initialState, targetState);
+    public HanoiInstance(int numberOfDisks) {
+        super(new HanoiState(numberOfDisks, 0, 0), new HanoiState(0, 0, numberOfDisks), HanoiOperators.OPERATORS);
         this.numberOfDisks = numberOfDisks;
     }
 
@@ -26,22 +26,8 @@ public class HanoiInstance extends Instance {
     }
 
     @Override
-    public void setTargetState(State targetState) {
-        if (targetState instanceof HanoiState) {
-            super.setTargetState((HanoiState) targetState);
-        }
-    }
-
-    @Override
     public State getTargetState() {
         return super.getTargetState();
-    }
-
-    @Override
-    public void setInitialState(State initialState) {
-        if (initialState instanceof HanoiState) {
-            super.setTargetState((HanoiState) initialState);
-        }
     }
 
     @Override

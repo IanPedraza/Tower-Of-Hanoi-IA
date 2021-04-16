@@ -7,7 +7,7 @@ import smai.domain.Instance;
 import smai.domain.SearchMethod;
 import smai.domain.State;
 
-public class DepthSearchDataSource extends SearchMethod implements SearchLocalDataSource {
+public class BreadthSearchDataSource extends SearchMethod implements SearchLocalDataSource {
 
     @Override
     public void resolve(Instance instance, Callback<Answer> callback) {
@@ -33,16 +33,16 @@ public class DepthSearchDataSource extends SearchMethod implements SearchLocalDa
                 callback.onSuccess(answer);
                 break;
             }
-
-            successors.clear();
             
+            successors.clear();
+
             for (State successor : this.getSuccessors(currentState, instance.getOperators())) {
                 if (!open.contains(successor) && !closed.contains(successor)) {
                     successors.add(successor);
                 }
             }
             
-            open.addAll(0, successors);
+            open.addAll(successors);
         }
 
         if (!answer.hasAnswer() && open.isEmpty()) {

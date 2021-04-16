@@ -1,33 +1,26 @@
 package smai.domain;
 
+import java.util.ArrayList;
+
 public class SearchMethod {
-    private int key;
-    private String value;
-
-    public SearchMethod(int key, String value) {
-        this.key = key;
-        this.value = value;
-    }
-
-    @Override
-    public String toString() {
-        return this.value;
+    
+    public ArrayList<State> getSuccessors(State state, Operator[] operators) {
+        ArrayList<State> successors = new ArrayList();
+        
+        for (Operator operator : operators) {
+            State successor = operator.apply(state);
+            
+            if (successor != null) {
+                successors.add(successor);
+            }
+        }
+        
+        return successors;
     }
     
-    public int getKey() {
-        return key;
-    }
-
-    public void setKey(int key) {
-        this.key = key;
-    }
-
-    public String getValue() {
-        return value;
-    }
-
-    public void setValue(String value) {
-        this.value = value;
+    public long getElapsedTime(long initialTime) {
+        long endTime = System.currentTimeMillis();
+        return endTime - initialTime;
     }
     
 }
