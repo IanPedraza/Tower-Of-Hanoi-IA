@@ -2,11 +2,11 @@ package smai.framework.hanoi;
 
 import smai.domain.Operator;
 import smai.domain.State;
+import smai.domain.Successor;
 
 public class HanoiOperators {
 
-    private static State move(HanoiState hanoiState, Tower origin, Tower destiny) {
-
+    private static State Factory(HanoiState currentState, Tower origin, Tower destiny) {
         if (origin.isEmpty()) {
             return null;
         }
@@ -14,70 +14,136 @@ public class HanoiOperators {
         if (destiny.isEmpty()) {
             Disk disk = origin.removeTop();
             destiny.addDisk(0, disk);
-            return hanoiState;
+            return currentState;
         }
 
         if (origin.getTop().lowerThan(destiny.getTop())) {
             Disk disk = origin.removeTop();
             destiny.addDisk(0, disk);
-            return hanoiState;
+            return currentState;
         } else {
             return null;
         }
     }
 
-    private static Operator MOVE_AB = (State state) -> {
-        if (state instanceof HanoiState) {
-            HanoiState hanoiState = (HanoiState) state.clone();
-            return HanoiOperators.move(hanoiState, hanoiState.getATower(), hanoiState.getBTower());
+    private static final Operator MOVE_AB = new Operator() {
+
+        @Override
+        public Successor apply(State state) {
+            if (state instanceof HanoiState) {
+                HanoiState hanoiState = (HanoiState) state.clone();
+                State resultState =  HanoiOperators.Factory(hanoiState, hanoiState.getATower(), hanoiState.getBTower());
+                return new Successor(resultState, this);
+            }
+
+            return null;
         }
 
-        return null;
+        @Override
+        public String getName() {
+            return "MOVE_AB";
+        }
+
     };
 
-    private static Operator MOVE_BA = (State state) -> {
-        if (state instanceof HanoiState) {
-            HanoiState hanoiState = (HanoiState) state.clone();
-            return HanoiOperators.move(hanoiState, hanoiState.getATower(), hanoiState.getBTower());
+    private static final Operator MOVE_BA = new Operator() {
+
+        @Override
+        public Successor apply(State state) {
+            if (state instanceof HanoiState) {
+                HanoiState hanoiState = (HanoiState) state.clone();
+                State resultState =  HanoiOperators.Factory(hanoiState, hanoiState.getBTower(), hanoiState.getATower());
+                return new Successor(resultState, this);
+            }
+
+            return null;
         }
 
-        return null;
+        @Override
+        public String getName() {
+            return "MOVE_BA";
+        }
+
     };
 
-    private static Operator MOVE_AC = (State state) -> {
-        if (state instanceof HanoiState) {
-            HanoiState hanoiState = (HanoiState) state.clone();
-            return HanoiOperators.move(hanoiState, hanoiState.getCTower(), hanoiState.getATower());
+    private static final Operator MOVE_AC = new Operator() {
+
+        @Override
+        public Successor apply(State state) {
+            if (state instanceof HanoiState) {
+                HanoiState hanoiState = (HanoiState) state.clone();
+                State resultState =  HanoiOperators.Factory(hanoiState, hanoiState.getATower(), hanoiState.getCTower());
+                return new Successor(resultState, this);
+            }
+
+            return null;
         }
 
-        return null;
+        @Override
+        public String getName() {
+            return "MOVE_AC";
+        }
+
     };
 
-    private static Operator MOVE_CA = (State state) -> {
-        if (state instanceof HanoiState) {
-            HanoiState hanoiState = (HanoiState) state.clone();
-            return HanoiOperators.move(hanoiState, hanoiState.getCTower(), hanoiState.getATower());
+    private static final Operator MOVE_CA = new Operator() {
+
+        @Override
+        public Successor apply(State state) {
+            if (state instanceof HanoiState) {
+                HanoiState hanoiState = (HanoiState) state.clone();
+                State resultState =  HanoiOperators.Factory(hanoiState, hanoiState.getCTower(), hanoiState.getATower());
+                return new Successor(resultState, this);
+            }
+
+            return null;
         }
 
-        return null;
+        @Override
+        public String getName() {
+            return "MOVE_CA";
+        }
+
     };
 
-    private static Operator MOVE_BC = (State state) -> {
-        if (state instanceof HanoiState) {
-            HanoiState hanoiState = (HanoiState) state.clone();
-            return HanoiOperators.move(hanoiState, hanoiState.getBTower(), hanoiState.getCTower());
+    private static final Operator MOVE_BC = new Operator() {
+
+        @Override
+        public Successor apply(State state) {
+            if (state instanceof HanoiState) {
+                HanoiState hanoiState = (HanoiState) state.clone();
+                State resultState =  HanoiOperators.Factory(hanoiState, hanoiState.getBTower(), hanoiState.getCTower());
+                return new Successor(resultState, this);
+            }
+
+            return null;
         }
 
-        return null;
+        @Override
+        public String getName() {
+            return "MOVE_BC";
+        }
+
     };
 
-    private static Operator MOVE_CB = (State state) -> {
-        if (state instanceof HanoiState) {
-            HanoiState hanoiState = (HanoiState) state.clone();
-            return HanoiOperators.move(hanoiState, hanoiState.getCTower(), hanoiState.getBTower());
+    private static final Operator MOVE_CB = new Operator() {
+
+        @Override
+        public Successor apply(State state) {
+            if (state instanceof HanoiState) {
+                HanoiState hanoiState = (HanoiState) state.clone();
+                State resultState =  HanoiOperators.Factory(hanoiState, hanoiState.getCTower(), hanoiState.getBTower());
+                return new Successor(resultState, this);
+            }
+
+            return null;
         }
 
-        return null;
+        @Override
+        public String getName() {
+            return "MOVE_CB";
+        }
+
     };
 
     public static Operator[] OPERATORS = {

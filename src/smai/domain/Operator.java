@@ -1,5 +1,12 @@
 package smai.domain;
 
-public interface Operator {
-    public State apply(State state);
+public abstract class Operator {
+    public abstract Successor apply(State state);
+    public abstract String getName();
+
+    @Override
+    public String toString() {
+        return getName();
+    }
+    
 }

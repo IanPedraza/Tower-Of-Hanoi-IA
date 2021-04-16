@@ -14,7 +14,6 @@ import smai.common.utils.SearchMethods;
 import smai.data.BreadthSearchDataSource;
 import smai.framework.hanoi.HanoiAnimatorDataSource;
 import smai.data.DepthSearchDataSource;
-import smai.domain.State;
 import smai.usecases.AnimateUseCase;
 import smai.usecases.ResolveUseCase;
 
@@ -23,9 +22,9 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
     private SearchMethodsRepository searchRepository;
     private ResolveUseCase resolveUseCase;
 
-    private AnimationDataSource animatorDataSource;
-    private AnimationRepository animationRepository;
-    private AnimateUseCase animateUseCase;
+    private final AnimationDataSource animatorDataSource;
+    private final AnimationRepository animationRepository;
+    private final AnimateUseCase animateUseCase;
 
     private Answer answer = null;
 
@@ -70,9 +69,7 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
         try {
             SearchMethodItem selectedMethods = (SearchMethodItem) this.cbSearchMethods.getSelectedItem();
             this.instanceSearchMethod(selectedMethods);
-
             int numberOfDisks = Integer.parseInt(this.cbNumberOfDisks.getSelectedItem().toString());
-
             return new HanoiInstance(numberOfDisks);
         } catch (Exception e) {
             return null;
@@ -83,14 +80,14 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
         this.taConsole.setText(null);
     }
     
-    private void run() {
+    private void run() {        
         HanoiInstance instance = (HanoiInstance) this.getInstance();
 
-        if (instance != null) {
-            this.taConsole.append("Loading...\n");
+        if (instance != null) {            
+            setDisableLoadingControls(true);
             resolveUseCase.invoke(instance, this);
         } else {
-            this.taConsole.append("Error...\n");
+            this.taConsole.append("Coul not create instance...\n");
         }
         
     }
@@ -104,29 +101,26 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
             animateUseCase.invoke(this.answer, this.jpAnimation);
         }
     }
+    
+    private void setDisableLoadingControls(boolean isLoading) {
+        boolean isEnabled = !isLoading;
+        
+        this.btnRun.setEnabled(isEnabled);
+        this.miRun.setEnabled(isEnabled);
+        this.btnPlay.setEnabled(isEnabled);
+    }
 
     @Override
     public void onSuccess(Answer result) {
+        setDisableLoadingControls(false);
+        
         if (result == null) {
             this.taConsole.append("Something went grown, please try again.");
             return;
         }
 
         this.answer = result;
-
-        for (State state : result.getWay()) {
-            this.taConsole.append(state.toString());
-            this.taConsole.append("\n");
-        }
-
-        if (answer.hasAnswer()) {
-            this.taConsole.append("Solved success.\n");
-        } else {
-            this.taConsole.append("No solution found.\n");
-        }
-        
-        this.taConsole.append(answer.getElapsedTime() + " ms");
-        this.taConsole.append("\n");
+        this.taConsole.append(answer.toString());
     }
 
     @Override
@@ -159,8 +153,8 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
         jPanel1 = new javax.swing.JPanel();
         jLabel4 = new javax.swing.JLabel();
         jMenuBar2 = new javax.swing.JMenuBar();
-        jMenu3 = new javax.swing.JMenu();
-        jMenuItem1 = new javax.swing.JMenuItem();
+        mRun = new javax.swing.JMenu();
+        miRun = new javax.swing.JMenuItem();
         miCleanConsole = new javax.swing.JMenuItem();
         jMenu4 = new javax.swing.JMenu();
         miExit = new javax.swing.JMenuItem();
@@ -249,7 +243,12 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
         jToolBar1.add(jLabel2);
         jToolBar1.add(jSeparator3);
 
-        cbNumberOfDisks.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "2", "3", "6", "10", "11" }));
+        cbNumberOfDisks.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "3", "6", "10", "11" }));
+        cbNumberOfDisks.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cbNumberOfDisksActionPerformed(evt);
+            }
+        });
         jToolBar1.add(cbNumberOfDisks);
 
         jLabel4.setText("Data");
@@ -273,16 +272,16 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
 
         jMenuBar2.setBackground(new java.awt.Color(255, 255, 255));
 
-        jMenu3.setText("Run");
+        mRun.setText("Run");
 
-        jMenuItem1.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_R, java.awt.event.InputEvent.CTRL_MASK));
-        jMenuItem1.setText("Run");
-        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
+        miRun.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_R, java.awt.event.InputEvent.CTRL_MASK));
+        miRun.setText("Run");
+        miRun.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem1ActionPerformed(evt);
+                miRunActionPerformed(evt);
             }
         });
-        jMenu3.add(jMenuItem1);
+        mRun.add(miRun);
 
         miCleanConsole.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_L, java.awt.event.InputEvent.CTRL_MASK));
         miCleanConsole.setText("Clean Console");
@@ -291,9 +290,9 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
                 miCleanConsoleActionPerformed(evt);
             }
         });
-        jMenu3.add(miCleanConsole);
+        mRun.add(miCleanConsole);
 
-        jMenuBar2.add(jMenu3);
+        jMenuBar2.add(mRun);
 
         jMenu4.setText("Window");
 
@@ -340,6 +339,7 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
         );
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void btnRunActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnRunActionPerformed
@@ -362,11 +362,15 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
         this.closeWindow();
     }//GEN-LAST:event_miExitActionPerformed
 
-    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem1ActionPerformed
+    private void miRunActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miRunActionPerformed
         this.run();
-    }//GEN-LAST:event_jMenuItem1ActionPerformed
+    }//GEN-LAST:event_miRunActionPerformed
 
-    public static void main(String args[]) {
+    private void cbNumberOfDisksActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbNumberOfDisksActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_cbNumberOfDisksActionPerformed
+
+    public static void main(String args[]) {        
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Windows".equals(info.getName())) {
@@ -402,10 +406,8 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
     private javax.swing.JLabel jLabel4;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
-    private javax.swing.JMenu jMenu3;
     private javax.swing.JMenu jMenu4;
     private javax.swing.JMenuBar jMenuBar2;
-    private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JToolBar.Separator jSeparator1;
@@ -414,9 +416,11 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
     private javax.swing.JToolBar.Separator jSeparator4;
     private javax.swing.JToolBar jToolBar1;
     private javax.swing.JPanel jpAnimation;
+    private javax.swing.JMenu mRun;
     private javax.swing.JMenuBar menuBar;
     private javax.swing.JMenuItem miCleanConsole;
     private javax.swing.JMenuItem miExit;
+    private javax.swing.JMenuItem miRun;
     private javax.swing.JTextArea taConsole;
     // End of variables declaration//GEN-END:variables
 

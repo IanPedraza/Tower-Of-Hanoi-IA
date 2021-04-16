@@ -1,54 +1,54 @@
 package smai.data;
 
 import java.util.ArrayList;
-import smai.common.utils.Callback;
 import smai.domain.Answer;
-import smai.domain.Instance;
-import smai.domain.SearchMethod;
-import smai.domain.State;
+import smai.domain.Successor;
 
-public class DepthSearchDataSource extends SearchMethod implements SearchLocalDataSource {
+public class DepthSearchDataSource extends SearchLocalDataSource {
 
     @Override
-    public void resolve(Instance instance, Callback<Answer> callback) {
+    public void resolve() {        
         Answer answer = new Answer(instance);
 
         long initialTime = System.currentTimeMillis();
-        
-        ArrayList<State> open = new ArrayList();
-        ArrayList<State> closed = new ArrayList();
-        ArrayList<State> successors = new ArrayList();
 
-        State currentState = instance.getInitialState();
+        ArrayList<smai.domain.State> open = new ArrayList();
+        ArrayList<smai.domain.State> closed = new ArrayList();
+        ArrayList<smai.domain.State> successors = new ArrayList();
+
+        smai.domain.State currentState = instance.getInitialState();
+        answer.addNode(currentState);
         open.add(currentState);
 
         while (!open.isEmpty()) {
             currentState = open.remove(0);
             closed.add(currentState);
-            answer.addWay(currentState);
 
             if (instance.isFinalState(currentState)) {
-                answer.setHasAnswer(true);
-                answer.setElapsedTime(this.getElapsedTime(initialTime));
+                answer.findPath(currentState);
+                answer.hasAnswer(true);
+                answer.setAnalyzedNodes(closed.size());
+                answer.setElapsedTime(getElapsedTime(initialTime));
                 callback.onSuccess(answer);
                 break;
             }
 
             successors.clear();
-            
-            for (State successor : this.getSuccessors(currentState, instance.getOperators())) {
-                if (!open.contains(successor) && !closed.contains(successor)) {
-                    successors.add(successor);
+
+            for (Successor successor : getSuccessors(currentState, instance.getOperators())) {
+                if (!open.contains(successor.getState()) && !closed.contains(successor.getState())) {
+                    successors.add(successor.getState());
+                    answer.addNode(currentState, successor);
                 }
             }
-            
+
             open.addAll(0, successors);
         }
 
         if (!answer.hasAnswer() && open.isEmpty()) {
-            answer.setElapsedTime(this.getElapsedTime(initialTime));
+            answer.setElapsedTime(getElapsedTime(initialTime));
             callback.onSuccess(answer);
         }
-    }
-
+    }    
+    
 }
