@@ -1,4 +1,4 @@
-package smai.common.utils;
+package smai.domain;
 
 public class SearchMethodItem {
     

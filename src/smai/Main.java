@@ -1,19 +1,20 @@
 package smai;
 
-import javax.swing.JOptionPane;
+import javax.swing.text.DefaultCaret;
+import static javax.swing.text.DefaultCaret.ALWAYS_UPDATE;
 import smai.common.utils.Callback;
-import smai.data.AnimationDataSource;
-import smai.data.AnimationRepository;
-import smai.data.SearchLocalDataSource;
-import smai.data.SearchMethodsRepository;
+import smai.data.datasources.AnimationDataSource;
+import smai.data.repositories.AnimationRepository;
+import smai.data.datasources.SearchLocalDataSource;
+import smai.data.repositories.SearchMethodsRepository;
 import smai.domain.Answer;
 import smai.domain.Instance;
 import smai.framework.hanoi.HanoiInstance;
-import smai.common.utils.SearchMethodItem;
+import smai.domain.SearchMethodItem;
 import smai.common.utils.SearchMethods;
-import smai.data.BreadthSearchDataSource;
-import smai.framework.hanoi.HanoiAnimatorDataSource;
-import smai.data.DepthSearchDataSource;
+import smai.data.searches.BreadthSearchDataSource;
+import smai.framework.hanoi.datasources.HanoiAnimatorDataSource;
+import smai.data.searches.DepthSearchDataSource;
 import smai.usecases.AnimateUseCase;
 import smai.usecases.ResolveUseCase;
 
@@ -34,10 +35,17 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
         this.animateUseCase = new AnimateUseCase(animationRepository);
 
         initComponents();
+        initUI();
         initAlgorithms();
     }
     
-    private void setMethod(SearchLocalDataSource localDataSource) {
+    private void initUI() {
+        DefaultCaret caret = (DefaultCaret) this.taConsole.getCaret();
+        caret.setUpdatePolicy(ALWAYS_UPDATE);
+        this.progressBar.setVisible(false);
+    }
+    
+    private void setSearchMethod(SearchLocalDataSource localDataSource) {
         this.searchRepository = new SearchMethodsRepository(localDataSource);
         this.resolveUseCase = new ResolveUseCase(searchRepository);
     }
@@ -53,15 +61,15 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
     private void instanceSearchMethod(SearchMethodItem method) {
         switch (method.getKey()) {
             case SearchMethods.DEPTH:
-                this.setMethod(new DepthSearchDataSource());
+                this.setSearchMethod(new DepthSearchDataSource());
                 break;
 
             case SearchMethods.BREADTH:
-                this.setMethod( new BreadthSearchDataSource());
+                this.setSearchMethod( new BreadthSearchDataSource());
                 break;
 
             default:
-                this.setMethod(new DepthSearchDataSource());
+                this.setSearchMethod(new DepthSearchDataSource());
         }
     }
 
@@ -75,10 +83,6 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
             return null;
         }
     }
-
-    private void cleanConsole() {
-        this.taConsole.setText(null);
-    }
     
     private void run() {        
         HanoiInstance instance = (HanoiInstance) this.getInstance();
@@ -87,7 +91,7 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
             setDisableLoadingControls(true);
             resolveUseCase.invoke(instance, this);
         } else {
-            this.taConsole.append("Coul not create instance...\n");
+            this.loge("Could not create instance");
         }
         
     }
@@ -98,16 +102,31 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
     
     private void playAnimation() {
         if (this.answer != null) {
-            animateUseCase.invoke(this.answer, this.jpAnimation);
+            animateUseCase.invoke(this.answer, this.pAnimation);
         }
     }
     
     private void setDisableLoadingControls(boolean isLoading) {
         boolean isEnabled = !isLoading;
         
+        this.progressBar.setIndeterminate(isLoading);
+        this.progressBar.setVisible(isLoading);
+        
         this.btnRun.setEnabled(isEnabled);
         this.miRun.setEnabled(isEnabled);
         this.btnPlay.setEnabled(isEnabled);
+    }
+    
+    private void log(String message) {
+        this.taConsole.append(message + "\n");
+    }
+    
+    private void loge(String error) {
+        this.taConsole.append(error + "\n");
+    }
+    
+    private void cleanConsole() {
+        this.taConsole.setText(null);
     }
 
     @Override
@@ -115,19 +134,23 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
         setDisableLoadingControls(false);
         
         if (result == null) {
-            this.taConsole.append("Something went grown, please try again.");
+            this.log("Something went grown, please try again.");
             return;
         }
 
         this.answer = result;
-        this.taConsole.append(answer.toString());
+        this.log(answer.toString());
     }
 
     @Override
     public void onFailed(Exception error) {
-        JOptionPane.showMessageDialog(this, "Error");
+        setDisableLoadingControls(false);
+        this.loge(error.getMessage());
     }
 
+    
+    /* MARK: - AUTO GENERATED METHOS */
+    
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -137,7 +160,7 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
         jMenu2 = new javax.swing.JMenu();
         jScrollPane1 = new javax.swing.JScrollPane();
         taConsole = new javax.swing.JTextArea();
-        jpAnimation = new javax.swing.JPanel();
+        pAnimation = new javax.swing.JPanel();
         btnPlay = new javax.swing.JButton();
         jToolBar1 = new javax.swing.JToolBar();
         btnRun = new javax.swing.JButton();
@@ -152,6 +175,7 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
         cbNumberOfDisks = new javax.swing.JComboBox();
         jPanel1 = new javax.swing.JPanel();
         jLabel4 = new javax.swing.JLabel();
+        progressBar = new javax.swing.JProgressBar();
         jMenuBar2 = new javax.swing.JMenuBar();
         mRun = new javax.swing.JMenu();
         miRun = new javax.swing.JMenuItem();
@@ -177,8 +201,8 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
         taConsole.setRows(5);
         jScrollPane1.setViewportView(taConsole);
 
-        jpAnimation.setBackground(new java.awt.Color(255, 255, 255));
-        jpAnimation.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(153, 153, 153)));
+        pAnimation.setBackground(new java.awt.Color(255, 255, 255));
+        pAnimation.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(153, 153, 153)));
 
         btnPlay.setText("Play");
         btnPlay.addActionListener(new java.awt.event.ActionListener() {
@@ -187,18 +211,18 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
             }
         });
 
-        javax.swing.GroupLayout jpAnimationLayout = new javax.swing.GroupLayout(jpAnimation);
-        jpAnimation.setLayout(jpAnimationLayout);
-        jpAnimationLayout.setHorizontalGroup(
-            jpAnimationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jpAnimationLayout.createSequentialGroup()
+        javax.swing.GroupLayout pAnimationLayout = new javax.swing.GroupLayout(pAnimation);
+        pAnimation.setLayout(pAnimationLayout);
+        pAnimationLayout.setHorizontalGroup(
+            pAnimationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pAnimationLayout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(btnPlay)
                 .addContainerGap())
         );
-        jpAnimationLayout.setVerticalGroup(
-            jpAnimationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jpAnimationLayout.createSequentialGroup()
+        pAnimationLayout.setVerticalGroup(
+            pAnimationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pAnimationLayout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(btnPlay)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -243,7 +267,7 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
         jToolBar1.add(jLabel2);
         jToolBar1.add(jSeparator3);
 
-        cbNumberOfDisks.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "3", "6", "10", "11" }));
+        cbNumberOfDisks.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "6", "10", "11" }));
         cbNumberOfDisks.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cbNumberOfDisksActionPerformed(evt);
@@ -260,13 +284,17 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel4)
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(progressBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addContainerGap(8, Short.MAX_VALUE)
-                .addComponent(jLabel4)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(progressBar, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(jLabel4))
                 .addContainerGap())
         );
 
@@ -319,7 +347,7 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
                     .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jToolBar1, javax.swing.GroupLayout.DEFAULT_SIZE, 930, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jpAnimation, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(pAnimation, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 238, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
@@ -331,7 +359,7 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
                 .addComponent(jToolBar1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jpAnimation, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(pAnimation, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 509, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -415,12 +443,13 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
     private javax.swing.JToolBar.Separator jSeparator3;
     private javax.swing.JToolBar.Separator jSeparator4;
     private javax.swing.JToolBar jToolBar1;
-    private javax.swing.JPanel jpAnimation;
     private javax.swing.JMenu mRun;
     private javax.swing.JMenuBar menuBar;
     private javax.swing.JMenuItem miCleanConsole;
     private javax.swing.JMenuItem miExit;
     private javax.swing.JMenuItem miRun;
+    private javax.swing.JPanel pAnimation;
+    private javax.swing.JProgressBar progressBar;
     private javax.swing.JTextArea taConsole;
     // End of variables declaration//GEN-END:variables
 

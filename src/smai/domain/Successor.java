@@ -30,6 +30,4 @@ public class Successor {
         this.operator = operator;
     }
     
-    
-    
 }

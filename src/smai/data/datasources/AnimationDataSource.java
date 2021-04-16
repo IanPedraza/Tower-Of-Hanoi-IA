@@ -1,4 +1,4 @@
-package smai.data;
+package smai.data.datasources;
 
 import javax.swing.JPanel;
 import smai.domain.Answer;

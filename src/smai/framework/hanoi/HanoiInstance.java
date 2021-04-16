@@ -26,8 +26,8 @@ public class HanoiInstance extends Instance {
     }
 
     @Override
-    public State getTargetState() {
-        return super.getTargetState();
+    public State getFinalState() {
+        return super.getFinalState();
     }
 
     @Override

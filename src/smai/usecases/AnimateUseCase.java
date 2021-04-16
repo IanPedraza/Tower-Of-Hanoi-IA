@@ -1,7 +1,7 @@
 package smai.usecases;
 
 import javax.swing.JPanel;
-import smai.data.AnimationRepository;
+import smai.data.repositories.AnimationRepository;
 import smai.domain.Answer;
 
 

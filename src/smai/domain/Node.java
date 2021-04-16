@@ -10,13 +10,7 @@ public class Node {
         this.parent = null;
         this.state = null;
         this.operator = null;
-    }
-
-    public Node(State state, Node parent) {
-        this.parent = parent;
-        this.state = state;
-        this.operator = null;
-    }
+    } 
     
     public Node(State state, Node parent, Operator operator) {
         this.parent = parent;
@@ -63,7 +57,5 @@ public class Node {
         
         return false;
     }
-
-    
     
 }

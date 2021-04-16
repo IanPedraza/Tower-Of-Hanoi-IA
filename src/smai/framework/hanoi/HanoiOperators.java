@@ -6,19 +6,19 @@ import smai.domain.Successor;
 
 public class HanoiOperators {
 
-    private static State Factory(HanoiState currentState, Tower origin, Tower destiny) {
+    private static State Factory(HanoiState currentState, HanoiTower origin, HanoiTower destiny) {
         if (origin.isEmpty()) {
             return null;
         }
 
         if (destiny.isEmpty()) {
-            Disk disk = origin.removeTop();
+            int disk = origin.removeTop();
             destiny.addDisk(0, disk);
             return currentState;
         }
 
-        if (origin.getTop().lowerThan(destiny.getTop())) {
-            Disk disk = origin.removeTop();
+        if (origin.getTop() < destiny.getTop()) {
+            int disk = origin.removeTop();
             destiny.addDisk(0, disk);
             return currentState;
         } else {

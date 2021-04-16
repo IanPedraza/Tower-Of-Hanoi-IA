@@ -1,7 +1,7 @@
 package smai.usecases;
 
 import smai.common.utils.Callback;
-import smai.data.SearchMethodsRepository;
+import smai.data.repositories.SearchMethodsRepository;
 import smai.domain.Answer;
 import smai.framework.hanoi.HanoiInstance;
 

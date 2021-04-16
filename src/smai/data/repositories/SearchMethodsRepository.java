@@ -1,5 +1,6 @@
-package smai.data;
+package smai.data.repositories;
 
+import smai.data.datasources.SearchLocalDataSource;
 import smai.common.utils.Callback;
 import smai.domain.Answer;
 import smai.domain.Instance;

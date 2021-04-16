@@ -1,5 +1,7 @@
 package smai.common.utils;
 
+import smai.domain.SearchMethodItem;
+
 public class SearchMethods {
     
     public static final SearchMethodItem[] METHODS = {

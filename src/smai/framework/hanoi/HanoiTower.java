@@ -1,22 +1,22 @@
 package smai.framework.hanoi;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 
-public class Tower {
+public class HanoiTower {
 
-    private ArrayList<Disk> disks;
+    private LinkedList<Integer> disks;
 
-    public Tower() {
-        this.disks = new ArrayList();
+    public HanoiTower() {
+        this.disks = new LinkedList();
     }
 
-    public Tower(Tower tower) {
-        this.disks = new ArrayList();
+    public HanoiTower(HanoiTower tower) {
+        this.disks = new LinkedList();
         this.disks.addAll(tower.disks);
     }
 
-    public Tower(int numberOfDisks) {
-        this.disks = new ArrayList();
+    public HanoiTower(int numberOfDisks) {
+        this.disks = new LinkedList();
         this.fill(numberOfDisks);
     }
 
@@ -28,39 +28,39 @@ public class Tower {
         return this.disks.size();
     }
 
-    public ArrayList<Disk> getDisks() {
+    public LinkedList<Integer> getDisks() {
         return disks;
     }
 
-    public void setDisks(ArrayList<Disk> disks) {
+    public void setDisks(LinkedList<Integer> disks) {
         this.disks = disks;
     }
 
-    public void addDisk(Disk disk) {
+    public void addDisk(int disk) {
         this.disks.add(disk);
     }
     
-    public void addDisk(int index, Disk disk) {
+    public void addDisk(int index, int disk) {
         this.disks.add(index, disk);
     }
 
-    public Disk removeDisk(int index) {
+    public int removeDisk(int index) {
         return this.disks.remove(index);
     }
 
-    public boolean removeDisk(Disk disk) {
+    public boolean removeDisk(Integer disk) {
         return this.disks.remove(disk);
     }
 
-    public Disk getDisk(int index) {
+    public int getDisk(int index) {
         return this.disks.get(index);
     }
 
-    public Disk getTop() {
+    public int getTop() {
         return this.disks.get(0);
     }
 
-    public Disk removeTop() {
+    public int removeTop() {
         return this.disks.remove(0);
     }
 
@@ -68,7 +68,7 @@ public class Tower {
         disks.clear();
 
         for (int index = 1; index <= numberOfDisks; index++) {
-            this.addDisk(new Disk(index));
+            this.addDisk(index);
 
         }
 //
@@ -80,7 +80,7 @@ public class Tower {
     @Override
     public boolean equals(Object obj) {
         try {
-            Tower tower = (Tower) obj;
+            HanoiTower tower = (HanoiTower) obj;
             boolean response = true;
 
             for (int index = 0; index < this.disks.size(); index++) {
@@ -100,7 +100,7 @@ public class Tower {
     public String toString() {
         String value = "";
 
-        for (Disk item : this.disks) {
+        for (int item : this.disks) {
             value += item + " ";
         }
 

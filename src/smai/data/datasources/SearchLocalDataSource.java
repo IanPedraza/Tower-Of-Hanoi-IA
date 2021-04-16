@@ -1,4 +1,4 @@
-package smai.data;
+package smai.data.datasources;
 
 import java.util.ArrayList;
 import smai.common.utils.Callback;
@@ -16,16 +16,21 @@ public abstract class SearchLocalDataSource extends Thread {
     
     @Override
     public void run() {
-        resolve();
+        try {
+            resolve();
+        } catch (Exception e) {
+            if (callback != null) callback.onFailed(e);
+        }
     }
 
-    protected final void resolve(Instance instance, Callback<Answer> callback) {
+    public final void resolve(Instance instance, Callback<Answer> callback) {
         this.instance = instance;
         this.callback = callback;
         this.start();
     }    
-
-    protected final ArrayList<Successor> getSuccessors(smai.domain.State state, Operator[] operators) {
+    
+    // TODO: move to another place
+    public final ArrayList<Successor> getSuccessors(smai.domain.State state, Operator[] operators) {
         ArrayList<Successor> successors = new ArrayList();
 
         for (Operator operator : operators) {
@@ -37,11 +42,6 @@ public abstract class SearchLocalDataSource extends Thread {
         }
 
         return successors;
-    }
-
-    protected final long getElapsedTime(long initialTime) {
-        long endTime = System.currentTimeMillis();
-        return endTime - initialTime;
     }
 
 }

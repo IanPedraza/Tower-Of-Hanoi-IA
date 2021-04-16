@@ -2,23 +2,23 @@ package smai.domain;
 
 public class Instance {
     
-    private State initialState, targetState;
+    private State initialState, finalState;
     private Operator[] operators;
     
     public Instance() {
         this.initialState = null;
-        this.targetState = null;
+        this.finalState = null;
         this.operators = new Operator[0];
     }
 
     public Instance(State initialState, State targetState, Operator[] operators) {
         this.initialState = initialState;
-        this.targetState = targetState;
+        this.finalState = targetState;
         this.operators = operators;
     }
 
     public boolean isFinalState(State state) {
-        return state.equals(targetState);
+        return state.equals(finalState);
     }
     
     public State getInitialState() {
@@ -29,12 +29,12 @@ public class Instance {
         this.initialState = initialState;
     }
 
-    public State getTargetState() {
-        return targetState;
+    public State getFinalState() {
+        return finalState;
     }
 
-    public void setTargetState(State targetState) {
-        this.targetState = targetState;
+    public void setFinalState(State finalState) {
+        this.finalState = finalState;
     }
 
     public Operator[] getOperators() {

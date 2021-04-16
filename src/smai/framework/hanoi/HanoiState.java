@@ -4,25 +4,25 @@ import smai.domain.State;
 
 public class HanoiState implements State {
 
-    private Tower aTower, bTower, cTower;
+    private HanoiTower aTower, bTower, cTower;
 
     public HanoiState() {
-        this.aTower = new Tower();
-        this.bTower = new Tower();
-        this.cTower = new Tower();
+        this.aTower = new HanoiTower();
+        this.bTower = new HanoiTower();
+        this.cTower = new HanoiTower();
     }
     
     public HanoiState(HanoiState hanoiState) {
-        this.aTower = new Tower(hanoiState.getATower());
-        this.bTower = new Tower(hanoiState.getBTower());
-        this.cTower = new Tower(hanoiState.getCTower());
+        this.aTower = new HanoiTower(hanoiState.getATower());
+        this.bTower = new HanoiTower(hanoiState.getBTower());
+        this.cTower = new HanoiTower(hanoiState.getCTower());
     }
 
 
     public HanoiState(int disksOnA, int disksOnB, int disksOnC) {
-        this.aTower = new Tower(disksOnA);
-        this.bTower = new Tower(disksOnB);
-        this.cTower = new Tower(disksOnC);
+        this.aTower = new HanoiTower(disksOnA);
+        this.bTower = new HanoiTower(disksOnB);
+        this.cTower = new HanoiTower(disksOnC);
     }
 
     public boolean instanceTower(String tower, int numberOfDisks) {
@@ -46,27 +46,27 @@ public class HanoiState implements State {
         return true;
     }
 
-    public Tower getATower() {
+    public HanoiTower getATower() {
         return aTower;
     }
 
-    public void setATower(Tower aTower) {
+    public void setATower(HanoiTower aTower) {
         this.aTower = aTower;
     }
 
-    public Tower getBTower() {
+    public HanoiTower getBTower() {
         return bTower;
     }
 
-    public void setBTower(Tower bTower) {
+    public void setBTower(HanoiTower bTower) {
         this.bTower = bTower;
     }
 
-    public Tower getCTower() {
+    public HanoiTower getCTower() {
         return cTower;
     }
 
-    public void setCTower(Tower cTower) {
+    public void setCTower(HanoiTower cTower) {
         this.cTower = cTower;
     }
 

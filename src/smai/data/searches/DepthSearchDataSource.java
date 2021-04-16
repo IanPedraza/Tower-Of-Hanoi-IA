@@ -1,6 +1,8 @@
-package smai.data;
+package smai.data.searches;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
+import smai.common.utils.TicToc;
+import smai.data.datasources.SearchLocalDataSource;
 import smai.domain.Answer;
 import smai.domain.Successor;
 
@@ -8,13 +10,13 @@ public class DepthSearchDataSource extends SearchLocalDataSource {
 
     @Override
     public void resolve() {        
-        Answer answer = new Answer(instance);
+        Answer answer = new Answer();
 
-        long initialTime = System.currentTimeMillis();
+        TicToc.getInstance().markStart();
 
-        ArrayList<smai.domain.State> open = new ArrayList();
-        ArrayList<smai.domain.State> closed = new ArrayList();
-        ArrayList<smai.domain.State> successors = new ArrayList();
+        LinkedList<smai.domain.State> open = new LinkedList ();
+        LinkedList<smai.domain.State> closed = new LinkedList ();
+        LinkedList <smai.domain.State> successors = new LinkedList();
 
         smai.domain.State currentState = instance.getInitialState();
         answer.addNode(currentState);
@@ -28,7 +30,7 @@ public class DepthSearchDataSource extends SearchLocalDataSource {
                 answer.findPath(currentState);
                 answer.hasAnswer(true);
                 answer.setAnalyzedNodes(closed.size());
-                answer.setElapsedTime(getElapsedTime(initialTime));
+                answer.setElapsedTime(TicToc.getInstance().getElapsedTime());
                 callback.onSuccess(answer);
                 break;
             }
@@ -46,7 +48,7 @@ public class DepthSearchDataSource extends SearchLocalDataSource {
         }
 
         if (!answer.hasAnswer() && open.isEmpty()) {
-            answer.setElapsedTime(getElapsedTime(initialTime));
+            answer.setElapsedTime(TicToc.getInstance().getElapsedTime());
             callback.onSuccess(answer);
         }
     }    

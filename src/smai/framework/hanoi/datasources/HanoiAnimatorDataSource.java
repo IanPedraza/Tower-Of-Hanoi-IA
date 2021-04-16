@@ -1,7 +1,7 @@
-package smai.framework.hanoi;
+package smai.framework.hanoi.datasources;
 
 import javax.swing.JPanel;
-import smai.data.AnimationDataSource;
+import smai.data.datasources.AnimationDataSource;
 import smai.domain.Answer;
 
 public class HanoiAnimatorDataSource implements AnimationDataSource {

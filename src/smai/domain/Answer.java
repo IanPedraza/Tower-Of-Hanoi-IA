@@ -1,29 +1,19 @@
 package smai.domain;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 
 public class Answer {
 
     private boolean hasAnswer;
-    private Instance instance;
-    private final ArrayList<Node> tree;
-    private ArrayList<Node> path;
+    private final LinkedList<Node> tree;
+    private LinkedList<Node> path;
     private long elapsedTime;
     private int analyzedNodes;
 
-    public Answer(Instance instance) {
-        this.hasAnswer = false;
-        this.tree = new ArrayList();
-        this.instance = instance;
-        this.elapsedTime = 0L;
-        this.analyzedNodes = 0;
-        this.path = null;
-    }
 
     public Answer() {
         this.hasAnswer = false;
-        this.tree = new ArrayList();
-        this.instance = null;
+        this.tree = new LinkedList();
         this.analyzedNodes = 0;
         this.path = null;
     }
@@ -48,7 +38,7 @@ public class Answer {
         this.hasAnswer = hasAnswer;
     }
 
-    public ArrayList<Node> getTree() {
+    public LinkedList<Node> getTree() {
         return tree;
     }
 
@@ -95,14 +85,6 @@ public class Answer {
         return tree.get(index);
     }
 
-    public Instance getInstance() {
-        return instance;
-    }
-
-    public void setInstance(Instance instance) {
-        this.instance = instance;
-    }
-
     public int getAnalyzedNodes() {
         return analyzedNodes;
     }
@@ -111,7 +93,7 @@ public class Answer {
         this.analyzedNodes = analyzedNodes;
     }
 
-    public ArrayList<Node> findPath(Node node, ArrayList<Node> path) {
+    public LinkedList<Node> findPath(Node node, LinkedList<Node> path) {
         path.add(0, node);
 
         if (node == null || node.getParent() == null) {
@@ -121,9 +103,9 @@ public class Answer {
         }
     }
 
-    public ArrayList<Node> findPath(State finalState) {
+    public LinkedList <Node> findPath(State finalState) {
         Node resultNode = this.getNode(finalState);
-        this.path = findPath(resultNode, new ArrayList());
+        this.path = findPath(resultNode, new LinkedList());
         return path;
     }
 
