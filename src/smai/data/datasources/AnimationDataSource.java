@@ -3,7 +3,66 @@ package smai.data.datasources;
 import javax.swing.JPanel;
 import smai.domain.Answer;
 
-public interface AnimationDataSource {
-    public void play(Answer answer, JPanel panel);
-    public void puase();
+public abstract class AnimationDataSource implements Runnable {
+
+    protected Answer answer;
+    protected JPanel canvas;
+    private Thread thread;
+    private boolean hasStarted;
+
+    public abstract void onStart();
+
+    public abstract void onRender();
+
+    public abstract void onPause();
+
+    public abstract void onResume();
+
+    public abstract void onStop();
+
+    public AnimationDataSource() {
+        this.thread = new Thread(this);
+        this.hasStarted = false;
+    }
+
+    public final void play() {
+        if (this.answer == null || this.canvas == null) {
+            System.out.println("Answer or canvas undefined");
+            return;
+        }
+        
+        this.onResume();
+    }
+    
+    public final void play(Answer answer, JPanel canvas) {
+        this.answer = answer;
+        this.canvas = canvas;
+
+        if (hasStarted) {
+            restart();
+        } else {
+            thread.start();
+            hasStarted = true;
+        }
+    }
+
+    private void restart() {
+        try {
+            this.onStop();
+            thread.join();
+            
+            this.thread = new Thread(this);
+            
+            thread.start();
+            hasStarted = true;
+        } catch (Exception e) {
+        }
+    }
+
+    @Override
+    public void run() {
+        this.onStart();
+        this.onRender();
+    }
+
 }

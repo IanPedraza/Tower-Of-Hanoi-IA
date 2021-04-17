@@ -5,33 +5,71 @@ import java.awt.Graphics;
 import java.util.LinkedList;
 import javax.swing.JPanel;
 import smai.data.datasources.AnimationDataSource;
-import smai.domain.Answer;
 import smai.domain.Instance;
 import smai.domain.Node;
 
-public abstract class StepperRenderable extends Thread implements AnimationDataSource {
+public abstract class StepperRenderable extends AnimationDataSource {
 
     private int fps;
     private int delay;
     private boolean isPaused;
-    private JPanel canvas;
-    private Answer answer;
+    private boolean hasFinished;
+
+    protected abstract void render(JPanel canvas, Node step, Instance instance);
 
     public StepperRenderable() {
         this.fps = 60;
         this.isPaused = false;
-        this.canvas = null;
-        setSleep();
+        this.hasFinished = false;
+        this.setDelay();
     }
 
-    protected abstract void render(JPanel canvas, Node step, Instance instance);
+    @Override
+    public void onStart() {
+        this.isPaused = false;
+        this.hasFinished = false;
+    }
+
+    @Override
+    public void onRender() {
+        LinkedList<Node> path = new LinkedList();
+        path.addAll(answer.getPath());
+
+        while (!hasFinished) {
+            while (!isPaused && !path.isEmpty()) {
+                clear();
+                render(this.canvas, path.removeFirst(), this.answer.getInstance());
+                sleep();
+            }
+
+            if (path.isEmpty()) {
+                this.hasFinished = true;
+            }
+        }
+    }
+    
+    @Override
+    public void onPause() {
+        this.isPaused = true;
+    }
+
+    @Override
+    public void onResume() {
+        this.isPaused = false;
+    }
+
+    @Override
+    public void onStop() {
+        this.hasFinished = true;
+        this.isPaused = true;
+    }
 
     public void setFps(int fps) {
         this.fps = fps;
-        setSleep();
+        setDelay();
     }
 
-    private void setSleep() {
+    private void setDelay() {
         this.delay = (int) (1000 / fps);
     }
 
@@ -47,36 +85,6 @@ public abstract class StepperRenderable extends Thread implements AnimationDataS
         Graphics graphics = canvas.getGraphics();
         graphics.setColor(Color.WHITE);
         graphics.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
-    }
-    
-    @Override
-    public void play(Answer answer, JPanel panel) {
-        this.isPaused = false;
-        this.canvas = panel;
-        this.answer = answer;
-          
-        try {
-            this.start();
-        } catch(Exception e) {
-            // ignore
-        }
-    }
-
-    @Override
-    public void puase() {
-        this.isPaused = true;
-    }
-
-    @Override
-    public void run() {
-        LinkedList<Node> path = new LinkedList();
-        path.addAll(answer.getPath());
-        
-        while (!isPaused && !path.isEmpty()) {   
-            clear();
-            render(canvas, path.removeFirst(), answer.getInstance());
-            sleep();
-        }
     }
 
 }

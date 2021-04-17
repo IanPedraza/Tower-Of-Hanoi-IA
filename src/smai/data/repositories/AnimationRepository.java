@@ -14,4 +14,12 @@ public class AnimationRepository {
     public void play(Answer answer, JPanel panel) {
         this.dataSource.play(answer, panel);
     }
+    
+    public void play() {
+        this.dataSource.play();
+    }
+    
+    public void pause() {
+        this.dataSource.onPause();
+    }
 }

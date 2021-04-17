@@ -16,7 +16,8 @@ import smai.common.utils.SearchMethods;
 import smai.data.searches.BreadthSearchDataSource;
 import smai.framework.hanoi.datasources.HanoiAnimatorDataSource;
 import smai.data.searches.DepthSearchDataSource;
-import smai.usecases.AnimateUseCase;
+import smai.usecases.PauseAnimationUseCase;
+import smai.usecases.PlayAnimationUseCase;
 import smai.usecases.ResolveUseCase;
 
 public class Main extends javax.swing.JFrame implements Callback<Answer> {
@@ -26,29 +27,39 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
 
     private final AnimationDataSource animatorDataSource;
     private final AnimationRepository animationRepository;
-    private final AnimateUseCase animateUseCase;
+    private final PlayAnimationUseCase playAnimationUseCase;
+    private final PauseAnimationUseCase pauseAnimationUseCase;
 
-    private Answer answer = null;
+    private Answer answer;
+    private boolean autoPlay;
+    private boolean isPlaying;
+    private boolean hasAnimatedAnswer;
 
     public Main() {
         this.animatorDataSource = new HanoiAnimatorDataSource();
         this.animationRepository = new AnimationRepository(animatorDataSource);
-        this.animateUseCase = new AnimateUseCase(animationRepository);
+        this.playAnimationUseCase = new PlayAnimationUseCase(animationRepository);
+        this.pauseAnimationUseCase = new PauseAnimationUseCase(animationRepository);
+
+        this.answer = null;
+        this.autoPlay = true;
+        this.isPlaying = false;
+        this.hasAnimatedAnswer = false;
 
         initComponents();
         initUI();
         initAlgorithms();
     }
-    
+
     private void initUI() {
         ImageIcon icon = new ImageIcon(getClass().getResource("src/icon.png"));
         setIconImage(icon.getImage());
-        
+
         DefaultCaret caret = (DefaultCaret) this.taConsole.getCaret();
         caret.setUpdatePolicy(ALWAYS_UPDATE);
         this.progressBar.setVisible(false);
     }
-    
+
     private void setSearchMethod(SearchLocalDataSource localDataSource) {
         this.searchRepository = new SearchMethodsRepository(localDataSource);
         this.resolveUseCase = new ResolveUseCase(searchRepository);
@@ -58,7 +69,7 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
         for (SearchMethodItem method : SearchMethods.METHODS) {
             this.cbSearchMethods.addItem(method);
         }
-        
+
         instanceSearchMethod(SearchMethods.METHODS[0]);
     }
 
@@ -69,7 +80,7 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
                 break;
 
             case SearchMethods.BREADTH:
-                this.setSearchMethod( new BreadthSearchDataSource());
+                this.setSearchMethod(new BreadthSearchDataSource());
                 break;
 
             default:
@@ -87,56 +98,100 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
             return null;
         }
     }
-    
-    private void run() {        
+
+    private void run() {
         HanoiInstance instance = (HanoiInstance) this.getInstance();
 
-        if (instance != null) {            
+        if (instance != null) {
+            this.answer = null;
+            this.hasAnimatedAnswer = false;
+            
             setDisableLoadingControls(true);
             resolveUseCase.invoke(instance, this);
         } else {
             this.loge("Could not create instance");
         }
-        
+
     }
     
+    private void enabledAnimationControls(boolean enabled) {        
+        setDisableLoadingControls(enabled);
+        this.btnPlay.setEnabled(enabled);
+        this.miPlay.setEnabled(enabled);
+    }
+    
+    private void togleAnimationControls() {
+        if (this.isPlaying) {
+            this.btnPlay.setIcon(new ImageIcon(getClass().getResource("src/pause.png")));
+            this.miPlay.setIcon(new ImageIcon(getClass().getResource("src/pause.png")));
+            this.miPlay.setText("Pause");
+        } else {
+            this.btnPlay.setIcon(new ImageIcon(getClass().getResource("src/play.png")));
+            this.miPlay.setIcon(new ImageIcon(getClass().getResource("src/play.png")));
+            this.miPlay.setText("Play");
+        }
+    }
+
     private void closeWindow() {
         this.dispose();
     }
-    
+
     private void playAnimation() {
-        if (this.answer != null) {
-            animateUseCase.invoke(this.answer, this.pAnimation);
+        if (this.answer == null) {
+            return;
         }
+
+        if (!hasAnimatedAnswer) {
+            this.isPlaying = true;
+            playAnimationUseCase.invoke(this.answer, this.pAnimation);
+            this.hasAnimatedAnswer = true;
+        } else {
+            this.isPlaying = !isPlaying;
+
+            if (isPlaying) {
+                playAnimationUseCase.invoke();
+            } else {
+                pauseAnimationUseCase.invoke();
+            }
+        }
+        
+        enabledAnimationControls(true);
+        togleAnimationControls();
     }
-    
+
     private void setDisableLoadingControls(boolean isLoading) {
         boolean isEnabled = !isLoading;
-        
+
         this.progressBar.setIndeterminate(isLoading);
         this.progressBar.setVisible(isLoading);
-        
+
         this.btnRun.setEnabled(isEnabled);
         this.miRun.setEnabled(isEnabled);
         this.btnPlay.setEnabled(isEnabled);
+        this.cbSearchMethods.setEnabled(isEnabled);
+        this.cbNumberOfDisks.setEnabled(isEnabled);
     }
-    
+
     private void log(String message) {
         this.taConsole.append(message + "\n");
     }
-    
+
     private void loge(String error) {
         this.taConsole.append(error + "\n");
     }
-    
+
     private void cleanConsole() {
         this.taConsole.setText(null);
+    }
+
+    private void setAutoPlay(boolean autoPlay) {
+        this.autoPlay = autoPlay;
     }
 
     @Override
     public void onSuccess(Answer result) {
         setDisableLoadingControls(false);
-        
+
         if (result == null) {
             this.log("Something went grown, please try again.");
             return;
@@ -144,6 +199,10 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
 
         this.answer = result;
         this.log(answer.toString());
+
+        if (this.autoPlay) {
+            this.playAnimation();
+        }
     }
 
     @Override
@@ -152,9 +211,7 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
         this.loge(error.getMessage());
     }
 
-    
-    /* MARK: - AUTO GENERATED METHOS */
-    
+
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -162,6 +219,7 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
         menuBar = new javax.swing.JMenuBar();
         jMenu1 = new javax.swing.JMenu();
         jMenu2 = new javax.swing.JMenu();
+        jCheckBoxMenuItem2 = new javax.swing.JCheckBoxMenuItem();
         jScrollPane1 = new javax.swing.JScrollPane();
         taConsole = new javax.swing.JTextArea();
         pAnimation = new javax.swing.JPanel();
@@ -185,6 +243,10 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
         mRun = new javax.swing.JMenu();
         miRun = new javax.swing.JMenuItem();
         miCleanConsole = new javax.swing.JMenuItem();
+        jMenu3 = new javax.swing.JMenu();
+        miPlay = new javax.swing.JMenuItem();
+        jSeparator5 = new javax.swing.JPopupMenu.Separator();
+        cbAutoPlay = new javax.swing.JCheckBoxMenuItem();
         jMenu4 = new javax.swing.JMenu();
         miExit = new javax.swing.JMenuItem();
 
@@ -193,6 +255,9 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
 
         jMenu2.setText("Edit");
         menuBar.add(jMenu2);
+
+        jCheckBoxMenuItem2.setSelected(true);
+        jCheckBoxMenuItem2.setText("jCheckBoxMenuItem2");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Tower Of Hanoi - AI");
@@ -344,6 +409,30 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
 
         jMenuBar2.add(mRun);
 
+        jMenu3.setText("Animation");
+
+        miPlay.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_P, java.awt.event.InputEvent.CTRL_MASK));
+        miPlay.setIcon(new javax.swing.ImageIcon(getClass().getResource("/smai/src/play-16.png"))); // NOI18N
+        miPlay.setText("Play");
+        miPlay.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                miPlayActionPerformed(evt);
+            }
+        });
+        jMenu3.add(miPlay);
+        jMenu3.add(jSeparator5);
+
+        cbAutoPlay.setSelected(true);
+        cbAutoPlay.setText("Auto Play Animation");
+        cbAutoPlay.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cbAutoPlayActionPerformed(evt);
+            }
+        });
+        jMenu3.add(cbAutoPlay);
+
+        jMenuBar2.add(jMenu3);
+
         jMenu4.setText("Window");
 
         miExit.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_F4, java.awt.event.InputEvent.ALT_MASK));
@@ -402,7 +491,7 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
     }//GEN-LAST:event_btnRunActionPerformed
 
     private void btnPlayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnPlayActionPerformed
-       this.playAnimation();
+        this.playAnimation();
     }//GEN-LAST:event_btnPlayActionPerformed
 
     private void btnCleanConsoleActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnCleanConsoleActionPerformed
@@ -425,7 +514,15 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
         // TODO add your handling code here:
     }//GEN-LAST:event_cbNumberOfDisksActionPerformed
 
-    public static void main(String args[]) {        
+    private void miPlayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miPlayActionPerformed
+        this.playAnimation();
+    }//GEN-LAST:event_miPlayActionPerformed
+
+    private void cbAutoPlayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbAutoPlayActionPerformed
+        this.setAutoPlay(cbAutoPlay.isSelected());
+    }//GEN-LAST:event_cbAutoPlayActionPerformed
+
+    public static void main(String args[]) {
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
                 if ("Windows".equals(info.getName())) {
@@ -454,13 +551,16 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
     private javax.swing.JButton btnCleanConsole;
     private javax.swing.JButton btnPlay;
     private javax.swing.JButton btnRun;
+    private javax.swing.JCheckBoxMenuItem cbAutoPlay;
     private javax.swing.JComboBox cbNumberOfDisks;
     private javax.swing.JComboBox cbSearchMethods;
+    private javax.swing.JCheckBoxMenuItem jCheckBoxMenuItem2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
+    private javax.swing.JMenu jMenu3;
     private javax.swing.JMenu jMenu4;
     private javax.swing.JMenuBar jMenuBar2;
     private javax.swing.JPanel jPanel1;
@@ -470,11 +570,13 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
     private javax.swing.JToolBar.Separator jSeparator2;
     private javax.swing.JToolBar.Separator jSeparator3;
     private javax.swing.JToolBar.Separator jSeparator4;
+    private javax.swing.JPopupMenu.Separator jSeparator5;
     private javax.swing.JToolBar jToolBar1;
     private javax.swing.JMenu mRun;
     private javax.swing.JMenuBar menuBar;
     private javax.swing.JMenuItem miCleanConsole;
     private javax.swing.JMenuItem miExit;
+    private javax.swing.JMenuItem miPlay;
     private javax.swing.JMenuItem miRun;
     private javax.swing.JPanel pAnimation;
     private javax.swing.JProgressBar progressBar;

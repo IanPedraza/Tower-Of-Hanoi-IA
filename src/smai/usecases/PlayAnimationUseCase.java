@@ -5,15 +5,18 @@ import smai.data.repositories.AnimationRepository;
 import smai.domain.Answer;
 
 
-public class AnimateUseCase {
+public class PlayAnimationUseCase {
     private final AnimationRepository repository;
 
-    public AnimateUseCase(AnimationRepository repository) {
+    public PlayAnimationUseCase(AnimationRepository repository) {
         this.repository = repository;
     }
     
     public void invoke(Answer answer, JPanel panel) {
         this.repository.play(answer, panel);
-    }
+    }  
     
+    public void invoke() {
+        this.repository.play();
+    }  
 }

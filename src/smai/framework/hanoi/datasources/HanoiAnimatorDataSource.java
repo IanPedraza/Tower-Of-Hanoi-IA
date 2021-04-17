@@ -20,7 +20,7 @@ public class HanoiAnimatorDataSource extends StepperRenderable {
     private final double minDisksRatioWidth = 0.04;
 
     public HanoiAnimatorDataSource() {
-        setFps(3);
+        setFps(15);
     }
 
     @Override
@@ -37,15 +37,17 @@ public class HanoiAnimatorDataSource extends StepperRenderable {
         int height = canvas.getHeight() - margin * 2;
         
         /* Background */ 
+        
         graphics.setColor(Color.LIGHT_GRAY);
         graphics.fill(new Rectangle2D.Double(0, 0, canvas.getWidth(), canvas.getHeight()));
 
         /* POSTS */
+        
         int spacePerPost = width / 3;
-
+        
         int postHeigth = (int) (height * ratePostHeigth);
         int postWidth = (int) (width*ratePostWidht);
-
+        
         int postX = (int) ((width * 0.1) + (spacePerPost * 0.5));
         
         int aPostX = postX;
@@ -59,6 +61,7 @@ public class HanoiAnimatorDataSource extends StepperRenderable {
         drawPost(graphics, cPostX, postY, postWidth, postHeigth);
 
         /* DISKS */
+        
         int baseDiskWidth = (int) (width * minDisksRatioWidth);
         int diskHeight = (int) (((postHeigth / hanoiInstance.getNumberOfDisks()) * maxDisksHeigth) * 0.5);
         int diskY = postY + postHeigth - diskHeight;
@@ -70,20 +73,21 @@ public class HanoiAnimatorDataSource extends StepperRenderable {
         addDisk(hanoiState.getCTower().getDisks(), baseDiskWidth, diskHeight, diskY, cPostX, graphics, alphaRate);
         
         /* Floor */
+        
         graphics.setColor(Color.BLACK);
         graphics.fill(new Rectangle2D.Double(0, diskY, canvas.getWidth(), canvas.getHeight()*0.15));
     }
     
     private void addDisk(LinkedList<Integer> disks, int baseDiskWidth, int diskHeight, int diskY, int postX, Graphics2D graphics, float alphaRate) {
         int maxIndex = disks.size() - 1;
-        int j = 1;
+        int numberOnStack = 1;
         
         for (int i = maxIndex; i >= 0; i--) {
             int disk = disks.get(i);
             int diskWidth = baseDiskWidth * disk;
             int diskX = (int) (postX - diskWidth / 2);
-            int dynamicDiskY = (int) diskY - (diskHeight*j);
-            j++;
+            int dynamicDiskY = (int) diskY - (diskHeight*numberOnStack);
+            numberOnStack++;
             
             drawDisk(graphics, diskX, dynamicDiskY, diskWidth, diskHeight, alphaRate*disk);
         }
