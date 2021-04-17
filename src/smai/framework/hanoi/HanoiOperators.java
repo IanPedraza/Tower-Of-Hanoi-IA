@@ -31,7 +31,7 @@ public class HanoiOperators {
         @Override
         public Successor apply(State state) {
             if (state instanceof HanoiState) {
-                HanoiState hanoiState = (HanoiState) state.clone();
+                HanoiState hanoiState = (HanoiState) state.copy();
                 State resultState =  HanoiOperators.Factory(hanoiState, hanoiState.getATower(), hanoiState.getBTower());
                 return new Successor(resultState, this);
             }
@@ -51,7 +51,7 @@ public class HanoiOperators {
         @Override
         public Successor apply(State state) {
             if (state instanceof HanoiState) {
-                HanoiState hanoiState = (HanoiState) state.clone();
+                HanoiState hanoiState = (HanoiState) state.copy();
                 State resultState =  HanoiOperators.Factory(hanoiState, hanoiState.getBTower(), hanoiState.getATower());
                 return new Successor(resultState, this);
             }
@@ -71,7 +71,7 @@ public class HanoiOperators {
         @Override
         public Successor apply(State state) {
             if (state instanceof HanoiState) {
-                HanoiState hanoiState = (HanoiState) state.clone();
+                HanoiState hanoiState = (HanoiState) state.copy();
                 State resultState =  HanoiOperators.Factory(hanoiState, hanoiState.getATower(), hanoiState.getCTower());
                 return new Successor(resultState, this);
             }
@@ -91,7 +91,7 @@ public class HanoiOperators {
         @Override
         public Successor apply(State state) {
             if (state instanceof HanoiState) {
-                HanoiState hanoiState = (HanoiState) state.clone();
+                HanoiState hanoiState = (HanoiState) state.copy();
                 State resultState =  HanoiOperators.Factory(hanoiState, hanoiState.getCTower(), hanoiState.getATower());
                 return new Successor(resultState, this);
             }
@@ -111,7 +111,7 @@ public class HanoiOperators {
         @Override
         public Successor apply(State state) {
             if (state instanceof HanoiState) {
-                HanoiState hanoiState = (HanoiState) state.clone();
+                HanoiState hanoiState = (HanoiState) state.copy();
                 State resultState =  HanoiOperators.Factory(hanoiState, hanoiState.getBTower(), hanoiState.getCTower());
                 return new Successor(resultState, this);
             }
@@ -131,7 +131,7 @@ public class HanoiOperators {
         @Override
         public Successor apply(State state) {
             if (state instanceof HanoiState) {
-                HanoiState hanoiState = (HanoiState) state.clone();
+                HanoiState hanoiState = (HanoiState) state.copy();
                 State resultState =  HanoiOperators.Factory(hanoiState, hanoiState.getCTower(), hanoiState.getBTower());
                 return new Successor(resultState, this);
             }

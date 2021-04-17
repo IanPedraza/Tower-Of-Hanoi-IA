@@ -5,4 +5,5 @@ import smai.domain.Answer;
 
 public interface AnimationDataSource {
     public void play(Answer answer, JPanel panel);
+    public void puase();
 }

@@ -1,16 +1,18 @@
 package smai.data.searches;
 
 import java.util.LinkedList;
+import smai.common.utils.Callback;
 import smai.common.utils.TicToc;
 import smai.data.datasources.SearchLocalDataSource;
 import smai.domain.Answer;
+import smai.domain.Instance;
 import smai.domain.Successor;
 
 public class DepthSearchDataSource extends SearchLocalDataSource {
 
     @Override
-    public void resolve() {        
-        Answer answer = new Answer();
+    public void process(Instance instance, Callback<Answer> callback) {        
+        Answer answer = new Answer(instance);
 
         TicToc.getInstance().markStart();
 
@@ -37,7 +39,7 @@ public class DepthSearchDataSource extends SearchLocalDataSource {
 
             successors.clear();
 
-            for (Successor successor : getSuccessors(currentState, instance.getOperators())) {
+            for (Successor successor : currentState.getSuccessors(instance.getOperators())) {
                 if (!open.contains(successor.getState()) && !closed.contains(successor.getState())) {
                     successors.add(successor.getState());
                     answer.addNode(currentState, successor);

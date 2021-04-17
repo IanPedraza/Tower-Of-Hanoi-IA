@@ -1,23 +1,20 @@
 package smai.data.datasources;
 
-import java.util.ArrayList;
 import smai.common.utils.Callback;
 import smai.domain.Answer;
 import smai.domain.Instance;
-import smai.domain.Operator;
-import smai.domain.Successor;
 
 public abstract class SearchLocalDataSource extends Thread {
     
-    protected Instance instance;
-    protected Callback<Answer> callback;
+    private Instance instance;
+    private Callback<Answer> callback;
     
-    public abstract void resolve();
+    protected abstract void process(Instance instance, Callback<Answer> callback);
     
     @Override
     public void run() {
         try {
-            resolve();
+            process(instance, callback);
         } catch (Exception e) {
             if (callback != null) callback.onFailed(e);
         }
@@ -28,20 +25,5 @@ public abstract class SearchLocalDataSource extends Thread {
         this.callback = callback;
         this.start();
     }    
-    
-    // TODO: move to another place
-    public final ArrayList<Successor> getSuccessors(smai.domain.State state, Operator[] operators) {
-        ArrayList<Successor> successors = new ArrayList();
-
-        for (Operator operator : operators) {
-            Successor successor = operator.apply(state);
-
-            if (successor.getState() != null) {
-                successors.add(successor);
-            }
-        }
-
-        return successors;
-    }
 
 }

@@ -9,13 +9,30 @@ public class Answer {
     private LinkedList<Node> path;
     private long elapsedTime;
     private int analyzedNodes;
+    private Instance instance;
 
-
+    public Answer(Instance instance) {
+        this.hasAnswer = false;
+        this.tree = new LinkedList();
+        this.analyzedNodes = 0;
+        this.path = null;
+        this.instance = instance;
+    }
+    
     public Answer() {
         this.hasAnswer = false;
         this.tree = new LinkedList();
         this.analyzedNodes = 0;
         this.path = null;
+        this.instance = null;
+    }
+
+    public Instance getInstance() {
+        return instance;
+    }
+
+    public void setInstance(Instance instance) {
+        this.instance = instance;
     }
 
     public long getElapsedTime() {
@@ -92,6 +109,10 @@ public class Answer {
     public void setAnalyzedNodes(int analyzedNodes) {
         this.analyzedNodes = analyzedNodes;
     }
+
+    public LinkedList<Node> getPath() {
+        return path;
+    }    
 
     public LinkedList<Node> findPath(Node node, LinkedList<Node> path) {
         path.add(0, node);

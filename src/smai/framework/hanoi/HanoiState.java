@@ -2,7 +2,7 @@ package smai.framework.hanoi;
 
 import smai.domain.State;
 
-public class HanoiState implements State {
+public class HanoiState extends State {
 
     private HanoiTower aTower, bTower, cTower;
 
@@ -92,10 +92,8 @@ public class HanoiState implements State {
     }
 
     @Override
-    public State clone()  {
+    public State copy()  {
         return new HanoiState(this);
-    }
-    
-    
+    }    
     
 }
