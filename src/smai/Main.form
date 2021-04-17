@@ -37,6 +37,9 @@
                 <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
                   <KeyStroke key="Ctrl+R"/>
                 </Property>
+                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                  <Image iconType="3" name="/smai/src/play-16.png"/>
+                </Property>
                 <Property name="text" type="java.lang.String" value="Run"/>
               </Properties>
               <Events>
@@ -47,6 +50,9 @@
               <Properties>
                 <Property name="accelerator" type="javax.swing.KeyStroke" editor="org.netbeans.modules.form.editors.KeyStrokeEditor">
                   <KeyStroke key="Ctrl+L"/>
+                </Property>
+                <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+                  <Image iconType="3" name="/smai/src/clean-16.png"/>
                 </Property>
                 <Property name="text" type="java.lang.String" value="Clean Console"/>
               </Properties>
@@ -131,7 +137,7 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Component id="jPanel2" min="-2" max="-2" attributes="0"/>
                   </Group>
-                  <Component id="jScrollPane1" pref="509" max="32767" attributes="0"/>
+                  <Component id="jScrollPane1" pref="522" max="32767" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="jPanel1" min="-2" max="-2" attributes="0"/>
@@ -190,7 +196,7 @@
         </DimensionLayout>
         <DimensionLayout dim="1">
           <Group type="103" groupAlignment="0" attributes="0">
-              <EmptySpace min="0" pref="452" max="32767" attributes="0"/>
+              <EmptySpace min="0" pref="460" max="32767" attributes="0"/>
           </Group>
         </DimensionLayout>
       </Layout>
@@ -205,7 +211,9 @@
       <SubComponents>
         <Component class="javax.swing.JButton" name="btnRun">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Run"/>
+            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+              <Image iconType="3" name="/smai/src/play.png"/>
+            </Property>
             <Property name="focusable" type="boolean" value="false"/>
             <Property name="horizontalTextPosition" type="int" value="0"/>
             <Property name="verticalTextPosition" type="int" value="3"/>
@@ -216,7 +224,9 @@
         </Component>
         <Component class="javax.swing.JButton" name="btnCleanConsole">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Clean Console"/>
+            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+              <Image iconType="3" name="/smai/src/clean.png"/>
+            </Property>
             <Property name="focusable" type="boolean" value="false"/>
             <Property name="horizontalTextPosition" type="int" value="0"/>
             <Property name="verticalTextPosition" type="int" value="3"/>
@@ -335,7 +345,7 @@
               <Group type="102" alignment="0" attributes="0">
                   <EmptySpace max="-2" attributes="0"/>
                   <Component id="btnPlay" min="-2" max="-2" attributes="0"/>
-                  <EmptySpace pref="9" max="32767" attributes="0"/>
+                  <EmptySpace max="32767" attributes="0"/>
               </Group>
           </Group>
         </DimensionLayout>
@@ -343,7 +353,9 @@
       <SubComponents>
         <Component class="javax.swing.JButton" name="btnPlay">
           <Properties>
-            <Property name="text" type="java.lang.String" value="Play"/>
+            <Property name="icon" type="javax.swing.Icon" editor="org.netbeans.modules.form.editors2.IconEditor">
+              <Image iconType="3" name="/smai/src/play.png"/>
+            </Property>
           </Properties>
           <Events>
             <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btnPlayActionPerformed"/>

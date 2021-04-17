@@ -1,5 +1,6 @@
 package smai;
 
+import javax.swing.ImageIcon;
 import javax.swing.text.DefaultCaret;
 import static javax.swing.text.DefaultCaret.ALWAYS_UPDATE;
 import smai.common.utils.Callback;
@@ -40,6 +41,10 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
     }
     
     private void initUI() {
+        ImageIcon icon = new ImageIcon(getClass().getResource("src/icon.png"));
+        System.out.println(icon);
+        setIconImage(icon.getImage());
+        
         DefaultCaret caret = (DefaultCaret) this.taConsole.getCaret();
         caret.setUpdatePolicy(ALWAYS_UPDATE);
         this.progressBar.setVisible(false);
@@ -213,13 +218,13 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
         );
         pAnimationLayout.setVerticalGroup(
             pAnimationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 452, Short.MAX_VALUE)
+            .addGap(0, 460, Short.MAX_VALUE)
         );
 
         jToolBar1.setFloatable(false);
         jToolBar1.setRollover(true);
 
-        btnRun.setText("Run");
+        btnRun.setIcon(new javax.swing.ImageIcon(getClass().getResource("/smai/src/play.png"))); // NOI18N
         btnRun.setFocusable(false);
         btnRun.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         btnRun.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -230,7 +235,7 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
         });
         jToolBar1.add(btnRun);
 
-        btnCleanConsole.setText("Clean Console");
+        btnCleanConsole.setIcon(new javax.swing.ImageIcon(getClass().getResource("/smai/src/clean.png"))); // NOI18N
         btnCleanConsole.setFocusable(false);
         btnCleanConsole.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         btnCleanConsole.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -288,7 +293,7 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
 
         jPanel2.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(153, 153, 153), 1, true));
 
-        btnPlay.setText("Play");
+        btnPlay.setIcon(new javax.swing.ImageIcon(getClass().getResource("/smai/src/play.png"))); // NOI18N
         btnPlay.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnPlayActionPerformed(evt);
@@ -309,7 +314,7 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(btnPlay)
-                .addContainerGap(9, Short.MAX_VALUE))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         jMenuBar2.setBackground(new java.awt.Color(255, 255, 255));
@@ -317,6 +322,7 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
         mRun.setText("Run");
 
         miRun.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_R, java.awt.event.InputEvent.CTRL_MASK));
+        miRun.setIcon(new javax.swing.ImageIcon(getClass().getResource("/smai/src/play-16.png"))); // NOI18N
         miRun.setText("Run");
         miRun.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -326,6 +332,7 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
         mRun.add(miRun);
 
         miCleanConsole.setAccelerator(javax.swing.KeyStroke.getKeyStroke(java.awt.event.KeyEvent.VK_L, java.awt.event.InputEvent.CTRL_MASK));
+        miCleanConsole.setIcon(new javax.swing.ImageIcon(getClass().getResource("/smai/src/clean-16.png"))); // NOI18N
         miCleanConsole.setText("Clean Console");
         miCleanConsole.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -379,7 +386,7 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
                         .addComponent(pAnimation, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jPanel2, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 509, Short.MAX_VALUE))
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 522, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
