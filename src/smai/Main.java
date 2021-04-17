@@ -42,7 +42,6 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
     
     private void initUI() {
         ImageIcon icon = new ImageIcon(getClass().getResource("src/icon.png"));
-        System.out.println(icon);
         setIconImage(icon.getImage());
         
         DefaultCaret caret = (DefaultCaret) this.taConsole.getCaret();
@@ -252,6 +251,7 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
         jToolBar1.add(jLabel1);
         jToolBar1.add(jSeparator4);
 
+        cbSearchMethods.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         jToolBar1.add(cbSearchMethods);
         jToolBar1.add(jSeparator2);
 
@@ -260,6 +260,7 @@ public class Main extends javax.swing.JFrame implements Callback<Answer> {
         jToolBar1.add(jLabel2);
         jToolBar1.add(jSeparator3);
 
+        cbNumberOfDisks.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         cbNumberOfDisks.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "6", "10", "11" }));
         cbNumberOfDisks.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {

@@ -71,10 +71,7 @@ public class HanoiTower {
             this.addDisk(index);
 
         }
-//
-//        for (int index = numberOfDisks; index > 0; index--) {
-//            this.addDisk(new Disk(index));
-//        }
+
     }
 
     @Override
