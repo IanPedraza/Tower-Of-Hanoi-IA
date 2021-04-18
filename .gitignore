@@ -22,28 +22,18 @@ tomcat
 *.sar
 *.class
 
-# Maven 
-target/
-
-# IntelliJ project files 
-*.iml
-*.iws
-*.ipr
-.idea/
-
-# eclipse project file
-.settings/
-.classpath
-.project
-
 # NetBeans specific
 nbproject/private/
 build/
 nbbuild/
 dist/
 nbdist/
+.nb-gradle/
 nbactions.xml
 nb-configuration.xml
+**/nbproject/private/
+**/nbproject/Makefile-*.mk
+**/nbproject/Package-*.bash
 
 
 # OS
