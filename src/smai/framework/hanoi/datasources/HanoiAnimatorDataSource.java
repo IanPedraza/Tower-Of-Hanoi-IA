@@ -5,6 +5,7 @@ import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 import java.util.LinkedList;
 import javax.swing.JPanel;
+import smai.data.datasources.AnimationListener;
 import smai.data.renders.StepperRenderable;
 import smai.domain.Instance;
 import smai.domain.Node;
@@ -17,10 +18,11 @@ public class HanoiAnimatorDataSource extends StepperRenderable {
     private final double ratePostHeigth = 0.7;
     private final double ratePostWidht = 0.0125;
     private final double maxDisksHeigth = 0.75;
-    private final double minDisksRatioWidth = 0.04;
+    private final double minDisksRatioWidth = 0.04;    
 
-    public HanoiAnimatorDataSource() {
-        setFps(15);
+    public HanoiAnimatorDataSource(AnimationListener callback) {
+        super(callback);
+        setFps(10);
     }
 
     @Override
@@ -95,18 +97,27 @@ public class HanoiAnimatorDataSource extends StepperRenderable {
 
     private void drawPost(Graphics2D graphics, int x, int y, int width, int height) {
         int offset = (int)(width*0.5);
-        graphics.setColor(Color.BLACK);
-        graphics.fill(new Rectangle2D.Double(x-offset, y, width, height));
+        double majorWidth = width*0.7;
+        double minorWidt = width*0.3;
+        
+        graphics.setColor(Color.DARK_GRAY);
+        graphics.fill(new Rectangle2D.Double(x-offset, y, majorWidth, height));
+        
+        graphics.setColor(Color.GRAY);
+        graphics.fill(new Rectangle2D.Double(x-offset+majorWidth, y, minorWidt, height));
     }
 
     private void drawDisk(Graphics2D graphics, int x, int y, int width, int height, float alpha) {
-        Rectangle2D rectangle = new Rectangle2D.Double(x, y, width, height);
+        double halfWidth = width*0.5;
         
         graphics.setColor(new Color(alpha, 0.1f, 0.0f));
-        graphics.fill(rectangle);
+        graphics.fill(new Rectangle2D.Double(x, y, halfWidth, height));
+        
+        graphics.setColor(new Color((float)(alpha*0.7), 0.1f, 0.0f));
+        graphics.fill(new Rectangle2D.Double(x+halfWidth, y, halfWidth, height));
         
         graphics.setColor(Color.BLACK);
-        graphics.draw(rectangle);
+        graphics.draw(new Rectangle2D.Double(x, y, width, height));
     }
 
 }

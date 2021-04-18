@@ -5,6 +5,7 @@ import java.awt.Graphics;
 import java.util.LinkedList;
 import javax.swing.JPanel;
 import smai.data.datasources.AnimationDataSource;
+import smai.data.datasources.AnimationListener;
 import smai.domain.Instance;
 import smai.domain.Node;
 
@@ -15,14 +16,15 @@ public abstract class StepperRenderable extends AnimationDataSource {
     private boolean isPaused;
     private boolean hasFinished;
 
-    protected abstract void render(JPanel canvas, Node step, Instance instance);
-
-    public StepperRenderable() {
+    public StepperRenderable(AnimationListener callback) {
+        super(callback);
         this.fps = 60;
         this.isPaused = false;
         this.hasFinished = false;
         this.setDelay();
     }
+
+    protected abstract void render(JPanel canvas, Node step, Instance instance);
 
     @Override
     public void onStart() {

@@ -9,7 +9,8 @@ public abstract class AnimationDataSource implements Runnable {
     protected JPanel canvas;
     private Thread thread;
     private boolean hasStarted;
-
+    protected AnimationListener callback;
+    
     public abstract void onStart();
 
     public abstract void onRender();
@@ -20,7 +21,8 @@ public abstract class AnimationDataSource implements Runnable {
 
     public abstract void onStop();
 
-    public AnimationDataSource() {
+    public AnimationDataSource(AnimationListener callback) {
+        this.callback = callback;
         this.thread = new Thread(this);
         this.hasStarted = false;
     }
@@ -56,13 +58,15 @@ public abstract class AnimationDataSource implements Runnable {
             thread.start();
             hasStarted = true;
         } catch (Exception e) {
+            this.callback.onAnimationError(e);
         }
     }
 
     @Override
-    public void run() {
+    public final void run() {
         this.onStart();
         this.onRender();
+        this.callback.onAnimationComplete();
     }
 
 }
