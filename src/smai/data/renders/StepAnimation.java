@@ -1,7 +1,5 @@
 package smai.data.renders;
 
-import java.awt.Color;
-import java.awt.Graphics;
 import java.util.LinkedList;
 import smai.data.datasources.AnimationDataSource;
 import smai.data.datasources.AnimationListener;
