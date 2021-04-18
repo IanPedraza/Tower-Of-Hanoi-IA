@@ -36,7 +36,6 @@ public class StepAnimation extends AnimationDataSource {
 
         while (!hasFinished) {
             while (!isPaused && !path.isEmpty()) {
-                clear();
                 render(path.removeFirst(), answer.getInstance());
                 sleep();
             }
@@ -87,11 +86,5 @@ public class StepAnimation extends AnimationDataSource {
     private void render(Node step, Instance instance){
         this.canvas.render(step, instance);
     };
-
-    private void clear() {
-        Graphics graphics = canvas.getGraphics();        
-        graphics.setColor(Color.WHITE);
-        graphics.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
-    }
     
 }
