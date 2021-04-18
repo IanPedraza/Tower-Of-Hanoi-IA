@@ -1,23 +1,26 @@
 package smai.usecases;
 
-import javax.swing.JPanel;
 import smai.data.renders.AnimationPanel;
 import smai.data.repositories.AnimationRepository;
 import smai.domain.Answer;
 
 
-public class PlayAnimationUseCase {
+public class AnimationControlUseCase {
     private final AnimationRepository repository;
 
-    public PlayAnimationUseCase(AnimationRepository repository) {
+    public AnimationControlUseCase(AnimationRepository repository) {
         this.repository = repository;
     }
     
-    public void invoke(Answer answer, AnimationPanel canvas) {
+    public void play(Answer answer, AnimationPanel canvas) {
         this.repository.play(answer, canvas);
     }  
     
-    public void invoke() {
+    public void play() {
         this.repository.play();
     }  
+    
+    public void pause() {
+        this.repository.pause();
+    }
 }

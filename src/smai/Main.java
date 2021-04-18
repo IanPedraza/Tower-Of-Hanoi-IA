@@ -20,8 +20,7 @@ import smai.data.datasources.AnimationListener;
 import smai.data.renders.StepAnimation;
 import smai.data.searches.BreadthSearchDataSource;
 import smai.data.searches.DepthSearchDataSource;
-import smai.usecases.PauseAnimationUseCase;
-import smai.usecases.PlayAnimationUseCase;
+import smai.usecases.AnimationControlUseCase;
 import smai.usecases.ResolveUseCase;
 
 public class Main extends javax.swing.JFrame implements Callback<Answer>, AnimationListener {
@@ -31,8 +30,7 @@ public class Main extends javax.swing.JFrame implements Callback<Answer>, Animat
 
     private final AnimationDataSource animatorDataSource;
     private final AnimationRepository animationRepository;
-    private final PlayAnimationUseCase playAnimationUseCase;
-    private final PauseAnimationUseCase pauseAnimationUseCase;
+    private final AnimationControlUseCase animationControlUseCase;
     
     private Answer answer;
     private boolean autoPlay;
@@ -42,8 +40,7 @@ public class Main extends javax.swing.JFrame implements Callback<Answer>, Animat
     public Main() {
         this.animatorDataSource = new StepAnimation(this);
         this.animationRepository = new AnimationRepository(animatorDataSource);
-        this.playAnimationUseCase = new PlayAnimationUseCase(animationRepository);
-        this.pauseAnimationUseCase = new PauseAnimationUseCase(animationRepository);
+        this.animationControlUseCase = new AnimationControlUseCase(animationRepository);
 
         this.answer = null;
         this.autoPlay = true;
@@ -131,7 +128,7 @@ public class Main extends javax.swing.JFrame implements Callback<Answer>, Animat
     private void animateResponse() {  
         if (this.answer == null) return;
         
-        playAnimationUseCase.invoke(this.answer, this.pAnimation);
+        animationControlUseCase.play(this.answer, this.animationPanel);
         
         this.isPlaying = true;
         this.isAnimatingResponse = true;
@@ -150,7 +147,7 @@ public class Main extends javax.swing.JFrame implements Callback<Answer>, Animat
         enableControls(false);
         enableLoader(true, StatusMessages.PLAYING_ANIMATION);
         
-        playAnimationUseCase.invoke();
+        animationControlUseCase.play();
         toggleMediaIcons();
     }
     
@@ -161,7 +158,7 @@ public class Main extends javax.swing.JFrame implements Callback<Answer>, Animat
         enableControls(true);
         enableLoader(false, StatusMessages.ANIMATION_PAUSED);
         
-        pauseAnimationUseCase.invoke();
+        animationControlUseCase.pause();
         toggleMediaIcons();
     }
     
@@ -299,7 +296,6 @@ public class Main extends javax.swing.JFrame implements Callback<Answer>, Animat
         jMenuItem2 = new javax.swing.JMenuItem();
         jScrollPane1 = new javax.swing.JScrollPane();
         taConsole = new javax.swing.JTextArea();
-        pAnimation = new smai.framework.hanoi.HanoiPanel();
         tbMenu = new javax.swing.JToolBar();
         btnRun = new javax.swing.JButton();
         btnCleanConsole = new javax.swing.JButton();
@@ -313,6 +309,7 @@ public class Main extends javax.swing.JFrame implements Callback<Answer>, Animat
         pMediaControls = new javax.swing.JPanel();
         btnPlay = new javax.swing.JButton();
         btnResetAnimation = new javax.swing.JButton();
+        animationPanel = new smai.framework.hanoi.HanoiPanel();
         jMenuBar2 = new javax.swing.JMenuBar();
         mRun = new javax.swing.JMenu();
         miRun = new javax.swing.JMenuItem();
@@ -349,20 +346,6 @@ public class Main extends javax.swing.JFrame implements Callback<Answer>, Animat
         taConsole.setFont(new java.awt.Font("Consolas", 0, 14)); // NOI18N
         taConsole.setRows(5);
         jScrollPane1.setViewportView(taConsole);
-
-        pAnimation.setBackground(new java.awt.Color(255, 255, 255));
-        pAnimation.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(153, 153, 153), 1, true));
-
-        javax.swing.GroupLayout pAnimationLayout = new javax.swing.GroupLayout(pAnimation);
-        pAnimation.setLayout(pAnimationLayout);
-        pAnimationLayout.setHorizontalGroup(
-            pAnimationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 684, Short.MAX_VALUE)
-        );
-        pAnimationLayout.setVerticalGroup(
-            pAnimationLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 464, Short.MAX_VALUE)
-        );
 
         tbMenu.setFloatable(false);
         tbMenu.setRollover(true);
@@ -467,6 +450,20 @@ public class Main extends javax.swing.JFrame implements Callback<Answer>, Animat
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
+        animationPanel.setBackground(new java.awt.Color(255, 255, 255));
+        animationPanel.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(153, 153, 153), 1, true));
+
+        javax.swing.GroupLayout animationPanelLayout = new javax.swing.GroupLayout(animationPanel);
+        animationPanel.setLayout(animationPanelLayout);
+        animationPanelLayout.setHorizontalGroup(
+            animationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+        animationPanelLayout.setVerticalGroup(
+            animationPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 0, Short.MAX_VALUE)
+        );
+
         jMenuBar2.setBackground(new java.awt.Color(255, 255, 255));
 
         mRun.setText("Run");
@@ -552,8 +549,8 @@ public class Main extends javax.swing.JFrame implements Callback<Answer>, Animat
                     .addComponent(tbMenu, javax.swing.GroupLayout.DEFAULT_SIZE, 930, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(pAnimation, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(pMediaControls, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(pMediaControls, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(animationPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 238, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap())
@@ -566,7 +563,7 @@ public class Main extends javax.swing.JFrame implements Callback<Answer>, Animat
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(pAnimation, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(animationPanel, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(pMediaControls, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 526, Short.MAX_VALUE))
@@ -649,6 +646,7 @@ public class Main extends javax.swing.JFrame implements Callback<Answer>, Animat
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private smai.framework.hanoi.HanoiPanel animationPanel;
     private javax.swing.JButton btnCleanConsole;
     private javax.swing.JButton btnPlay;
     private javax.swing.JButton btnResetAnimation;
@@ -676,7 +674,6 @@ public class Main extends javax.swing.JFrame implements Callback<Answer>, Animat
     private javax.swing.JMenuItem miPlay;
     private javax.swing.JMenuItem miReplay;
     private javax.swing.JMenuItem miRun;
-    private smai.data.renders.AnimationPanel pAnimation;
     private javax.swing.JPanel pMediaControls;
     private javax.swing.JPanel pStatusBar;
     private javax.swing.JProgressBar progressBar;
