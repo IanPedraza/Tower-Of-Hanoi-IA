@@ -3,44 +3,41 @@ package smai.data.renders;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.util.LinkedList;
-import javax.swing.JPanel;
 import smai.data.datasources.AnimationDataSource;
 import smai.data.datasources.AnimationListener;
 import smai.domain.Instance;
 import smai.domain.Node;
 
-public abstract class StepperRenderable extends AnimationDataSource {
+public class StepAnimation extends AnimationDataSource {
 
     private int fps;
     private int delay;
     private boolean isPaused;
     private boolean hasFinished;
 
-    public StepperRenderable(AnimationListener callback) {
+    public StepAnimation(AnimationListener callback) {
         super(callback);
-        this.fps = 60;
+        this.fps = 10;
         this.isPaused = false;
         this.hasFinished = false;
         this.setDelay();
     }
 
-    protected abstract void render(JPanel canvas, Node step, Instance instance);
-
     @Override
-    public void onStart() {
+    public void start() {
         this.isPaused = false;
         this.hasFinished = false;
     }
 
     @Override
-    public void onRender() {
+    public void render() {
         LinkedList<Node> path = new LinkedList();
-        path.addAll(answer.getPath());
+        path.addAll(answer.getPath());       
 
         while (!hasFinished) {
             while (!isPaused && !path.isEmpty()) {
                 clear();
-                render(this.canvas, path.removeFirst(), this.answer.getInstance());
+                render(path.removeFirst(), answer.getInstance());
                 sleep();
             }
 
@@ -51,17 +48,17 @@ public abstract class StepperRenderable extends AnimationDataSource {
     }
     
     @Override
-    public void onPause() {
+    public void pause() {
         this.isPaused = true;
     }
 
     @Override
-    public void onResume() {
+    public void resume() {
         this.isPaused = false;
     }
 
     @Override
-    public void onStop() {
+    protected void stop() {
         this.hasFinished = true;
         this.isPaused = true;
     }
@@ -71,6 +68,10 @@ public abstract class StepperRenderable extends AnimationDataSource {
         setDelay();
     }
 
+    public int getFps() {
+        return fps;
+    }
+    
     private void setDelay() {
         this.delay = (int) (1000 / fps);
     }
@@ -82,11 +83,15 @@ public abstract class StepperRenderable extends AnimationDataSource {
             // ignored
         }
     }
+    
+    private void render(Node step, Instance instance){
+        this.canvas.render(step, instance);
+    };
 
     private void clear() {
         Graphics graphics = canvas.getGraphics();
         graphics.setColor(Color.WHITE);
         graphics.fillRect(0, 0, canvas.getWidth(), canvas.getHeight());
     }
-
+    
 }

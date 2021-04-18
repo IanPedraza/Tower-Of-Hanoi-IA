@@ -1,47 +1,42 @@
-package smai.framework.hanoi.datasources;
+package smai.framework.hanoi;
 
 import java.awt.Color;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 import java.util.LinkedList;
-import javax.swing.JPanel;
-import smai.data.datasources.AnimationListener;
-import smai.data.renders.StepperRenderable;
-import smai.domain.Instance;
-import smai.domain.Node;
-import smai.framework.hanoi.HanoiInstance;
-import smai.framework.hanoi.HanoiState;
+import smai.data.renders.AnimationPanel;
 
-public class HanoiAnimatorDataSource extends StepperRenderable {
+public class HanoiPanel extends AnimationPanel {
 
     private final int margin = 20;
     private final double ratePostHeigth = 0.7;
     private final double ratePostWidht = 0.0125;
     private final double maxDisksHeigth = 0.75;
-    private final double minDisksRatioWidth = 0.04;    
-
-    public HanoiAnimatorDataSource(AnimationListener callback) {
-        super(callback);
-        setFps(10);
-    }
-
+    private final double minDisksRatioWidth = 0.04;   
+    
     @Override
-    protected void render(JPanel canvas, Node step, Instance instance) {
+    protected void paintComponent(Graphics g) {
+        
+        if (instance == null && step == null) {
+            return;
+        }
+        
         if (!(instance instanceof HanoiInstance) && !(step.getState() instanceof HanoiState)) {
             return;
         }
-
+        
         HanoiInstance hanoiInstance = (HanoiInstance) instance;
         HanoiState hanoiState = (HanoiState) step.getState();
 
-        Graphics2D graphics = (Graphics2D) canvas.getGraphics();
-        int width = canvas.getWidth() - margin * 2;
-        int height = canvas.getHeight() - margin * 2;
+        Graphics2D graphics = (Graphics2D) g;
+        int width = this.getWidth() - margin * 2;
+        int height = this.getHeight() - margin * 2;
         
         /* Background */ 
         
         graphics.setColor(Color.LIGHT_GRAY);
-        graphics.fill(new Rectangle2D.Double(0, 0, canvas.getWidth(), canvas.getHeight()));
+        graphics.fill(new Rectangle2D.Double(0, 0, this.getWidth(), this.getHeight()));
 
         /* POSTS */
         
@@ -77,9 +72,9 @@ public class HanoiAnimatorDataSource extends StepperRenderable {
         /* Floor */
         
         graphics.setColor(Color.BLACK);
-        graphics.fill(new Rectangle2D.Double(0, diskY, canvas.getWidth(), canvas.getHeight()*0.15));
+        graphics.fill(new Rectangle2D.Double(0, diskY, this.getWidth(), this.getHeight()*0.15));
     }
-    
+        
     private void addDisk(LinkedList<Integer> disks, int baseDiskWidth, int diskHeight, int diskY, int postX, Graphics2D graphics, float alphaRate) {
         int maxIndex = disks.size() - 1;
         int numberOnStack = 1;
@@ -113,11 +108,10 @@ public class HanoiAnimatorDataSource extends StepperRenderable {
         graphics.setColor(new Color(alpha, 0.1f, 0.0f));
         graphics.fill(new Rectangle2D.Double(x, y, halfWidth, height));
         
-        graphics.setColor(new Color((float)(alpha*0.7), 0.1f, 0.0f));
+        graphics.setColor(new Color((float)(alpha*0.8), 0.1f, 0.0f));
         graphics.fill(new Rectangle2D.Double(x+halfWidth, y, halfWidth, height));
         
         graphics.setColor(Color.BLACK);
         graphics.draw(new Rectangle2D.Double(x, y, width, height));
     }
-
 }

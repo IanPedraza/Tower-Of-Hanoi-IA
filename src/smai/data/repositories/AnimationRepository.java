@@ -2,6 +2,7 @@ package smai.data.repositories;
 
 import smai.data.datasources.AnimationDataSource;
 import javax.swing.JPanel;
+import smai.data.renders.AnimationPanel;
 import smai.domain.Answer;
 
 public class AnimationRepository {
@@ -11,8 +12,8 @@ public class AnimationRepository {
         this.dataSource = dataSource;
     }
     
-    public void play(Answer answer, JPanel panel) {
-        this.dataSource.play(answer, panel);
+    public void play(Answer answer, AnimationPanel canvas) {
+        this.dataSource.play(answer, canvas);
     }
     
     public void play() {
@@ -20,6 +21,6 @@ public class AnimationRepository {
     }
     
     public void pause() {
-        this.dataSource.onPause();
+        this.dataSource.pause();
     }
 }

@@ -1,6 +1,7 @@
 package smai.usecases;
 
 import javax.swing.JPanel;
+import smai.data.renders.AnimationPanel;
 import smai.data.repositories.AnimationRepository;
 import smai.domain.Answer;
 
@@ -12,8 +13,8 @@ public class PlayAnimationUseCase {
         this.repository = repository;
     }
     
-    public void invoke(Answer answer, JPanel panel) {
-        this.repository.play(answer, panel);
+    public void invoke(Answer answer, AnimationPanel canvas) {
+        this.repository.play(answer, canvas);
     }  
     
     public void invoke() {

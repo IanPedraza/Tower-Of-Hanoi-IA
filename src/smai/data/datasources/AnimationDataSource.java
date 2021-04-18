@@ -1,31 +1,29 @@
 package smai.data.datasources;
 
-import javax.swing.JPanel;
+import smai.data.renders.AnimationPanel;
 import smai.domain.Answer;
 
 public abstract class AnimationDataSource implements Runnable {
 
-    protected Answer answer;
-    protected JPanel canvas;
     private Thread thread;
-    private boolean hasStarted;
+    protected Answer answer;
+    protected AnimationPanel canvas;
     protected AnimationListener callback;
     
-    public abstract void onStart();
-
-    public abstract void onRender();
-
-    public abstract void onPause();
-
-    public abstract void onResume();
-
-    public abstract void onStop();
-
-    public AnimationDataSource(AnimationListener callback) {
+    protected AnimationDataSource(AnimationListener callback) {  
         this.callback = callback;
         this.thread = new Thread(this);
-        this.hasStarted = false;
     }
+    
+    protected abstract void start();
+
+    protected abstract void render();
+
+    public abstract void pause();
+
+    public abstract void resume();
+
+    protected abstract void stop();
 
     public final void play() {
         if (this.answer == null || this.canvas == null) {
@@ -33,30 +31,28 @@ public abstract class AnimationDataSource implements Runnable {
             return;
         }
         
-        this.onResume();
+        this.resume();
     }
     
-    public final void play(Answer answer, JPanel canvas) {
+    public final void play(Answer answer, AnimationPanel canvas) {
         this.answer = answer;
         this.canvas = canvas;
-
-        if (hasStarted) {
+        
+        if (thread.isAlive()) {
             restart();
         } else {
             thread.start();
-            hasStarted = true;
         }
     }
 
     private void restart() {
         try {
-            this.onStop();
+            this.stop();
             thread.join();
             
             this.thread = new Thread(this);
             
             thread.start();
-            hasStarted = true;
         } catch (Exception e) {
             this.callback.onAnimationError(e);
         }
@@ -64,8 +60,8 @@ public abstract class AnimationDataSource implements Runnable {
 
     @Override
     public final void run() {
-        this.onStart();
-        this.onRender();
+        this.start();
+        this.render();
         this.callback.onAnimationComplete();
     }
 
