@@ -1,14 +1,15 @@
 package smai.common.utils;
 
 import smai.domain.SearchMethodItem;
+import smai.domain.SearchType;
 
 public class SearchMethods {
     
     public static final SearchMethodItem[] METHODS = {
-        new SearchMethodItem(SearchMethods.DEPTH, "Depth-first search"),
-        new SearchMethodItem(SearchMethods.BREADTH, "Breadth-first search"),
-        //new SearchMethodItem(SearchMethods.A_STAR, "A Start"),
-    };
+        new SearchMethodItem(SearchMethods.DEPTH, "Depth-first search", SearchType.UNINFORMED),
+        new SearchMethodItem(SearchMethods.BREADTH, "Breadth-first search", SearchType.UNINFORMED),
+        new SearchMethodItem(SearchMethods.A_STAR, "A Start", SearchType.INFORMED),
+    };   
     
     public static final int DEPTH = 0;
     public static final int BREADTH = 1;    

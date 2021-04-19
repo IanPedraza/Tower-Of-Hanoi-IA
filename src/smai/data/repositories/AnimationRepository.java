@@ -1,7 +1,6 @@
 package smai.data.repositories;
 
 import smai.data.datasources.AnimationDataSource;
-import javax.swing.JPanel;
 import smai.data.renders.AnimationPanel;
 import smai.domain.Answer;
 

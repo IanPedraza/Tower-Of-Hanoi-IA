@@ -7,7 +7,7 @@ import java.awt.geom.Rectangle2D;
 import java.util.LinkedList;
 import smai.data.renders.AnimationPanel;
 
-public class HanoiPanel extends AnimationPanel {
+public class HanoiAnimationPanel extends AnimationPanel {
 
     private final int margin = 20;
     private final double ratePostHeigth = 0.7;
@@ -59,15 +59,15 @@ public class HanoiPanel extends AnimationPanel {
 
         /* DISKS */
         
-        int baseDiskWidth = (int) (width * minDisksRatioWidth);
+        int maxDisksWidth = (int) ((width/3) * 0.85);
         int diskHeight = (int) (((postHeigth / hanoiInstance.getNumberOfDisks()) * maxDisksHeigth) * 0.5);
         int diskY = postY + postHeigth - diskHeight;
         
         float alphaRate = 1.0f / hanoiInstance.getNumberOfDisks();
         
-        addDisk(hanoiState.getATower().getDisks(), baseDiskWidth, diskHeight, diskY, aPostX, graphics, alphaRate);
-        addDisk(hanoiState.getBTower().getDisks(), baseDiskWidth, diskHeight, diskY, bPostX, graphics, alphaRate);
-        addDisk(hanoiState.getCTower().getDisks(), baseDiskWidth, diskHeight, diskY, cPostX, graphics, alphaRate);
+        addDisk(hanoiState.getATower().getDisks(), hanoiInstance.getNumberOfDisks(), maxDisksWidth, diskHeight, diskY, aPostX, graphics, alphaRate);
+        addDisk(hanoiState.getBTower().getDisks(), hanoiInstance.getNumberOfDisks(), maxDisksWidth, diskHeight, diskY, bPostX, graphics, alphaRate);
+        addDisk(hanoiState.getCTower().getDisks(), hanoiInstance.getNumberOfDisks(), maxDisksWidth, diskHeight, diskY, cPostX, graphics, alphaRate);
         
         /* Floor */
         
@@ -75,13 +75,13 @@ public class HanoiPanel extends AnimationPanel {
         graphics.fill(new Rectangle2D.Double(0, diskY, this.getWidth(), this.getHeight()*0.15));
     }
         
-    private void addDisk(LinkedList<Integer> disks, int baseDiskWidth, int diskHeight, int diskY, int postX, Graphics2D graphics, float alphaRate) {
+    private void addDisk(LinkedList<Integer> disks, int numberOfDisks,int baseDiskWidth, int diskHeight, int diskY, int postX, Graphics2D graphics, float alphaRate) {
         int maxIndex = disks.size() - 1;
         int numberOnStack = 1;
         
         for (int i = maxIndex; i >= 0; i--) {
             int disk = disks.get(i);
-            int diskWidth = baseDiskWidth * disk;
+            int diskWidth = (baseDiskWidth * disk) / numberOfDisks;
             int diskX = (int) (postX - diskWidth / 2);
             int dynamicDiskY = (int) diskY - (diskHeight*numberOnStack);
             numberOnStack++;

@@ -3,12 +3,13 @@ package smai.data.searches;
 import java.util.LinkedList;
 import smai.common.utils.Callback;
 import smai.common.utils.TicToc;
-import smai.data.datasources.SearchLocalDataSource;
+import smai.data.datasources.UninformedSearchLocalDataSource;
 import smai.domain.Answer;
 import smai.domain.Instance;
+import smai.domain.Node;
 import smai.domain.Successor;
 
-public class BreadthSearchDataSource extends SearchLocalDataSource {
+public class BreadthSearchDataSource extends UninformedSearchLocalDataSource {
 
     @Override
     public void process(Instance instance, Callback<Answer> callback) {
@@ -16,34 +17,33 @@ public class BreadthSearchDataSource extends SearchLocalDataSource {
 
         TicToc.getInstance().markStart();
 
-        LinkedList<smai.domain.State> open = new LinkedList();
-        LinkedList<smai.domain.State> closed = new LinkedList();
-        LinkedList<smai.domain.State> successors = new LinkedList();
+        LinkedList<Node> open = new LinkedList();
+        LinkedList<Node> closed = new LinkedList();
+        LinkedList<Node> successors = new LinkedList();
 
-        smai.domain.State currentState = instance.getInitialState();
-        answer.addNode(currentState);
-        open.add(currentState);
+        Node currentNode = new Node(instance.getInitialState());
+        open.add(currentNode);
 
         while (!open.isEmpty()) {
-            currentState = open.remove(0);
-            closed.add(currentState);
+            currentNode = open.remove(0);
+            closed.add(currentNode);
 
-            if (instance.isFinalState(currentState)) {
-                answer.findPath(currentState);
+            if (instance.isFinalState(currentNode.getState())) {
+                answer.setPath(findPath(currentNode));
                 answer.hasAnswer(true);
                 answer.setAnalyzedNodes(closed.size());
                 answer.setElapsedTime(TicToc.getInstance().getElapsedTime());
-                
                 callback.onSuccess(answer);
                 break;
             }
 
             successors.clear();
 
-            for (Successor successor : currentState.getSuccessors(instance.getOperators())) {
-                if (!open.contains(successor.getState()) && !closed.contains(successor.getState())) {
-                    successors.add(successor.getState());
-                    answer.addNode(currentState, successor);
+            for (Successor successor : currentNode.getState().getSuccessors(instance.getOperators())) {
+                Node successorNode = new Node(successor.getState(), currentNode, successor.getOperator());
+                
+                if (!open.contains(successorNode) && !closed.contains(successorNode)) {
+                    successors.add(successorNode);
                 }
             }
 

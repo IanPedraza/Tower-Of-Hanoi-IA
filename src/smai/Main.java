@@ -8,36 +8,49 @@ import smai.common.Assets;
 import smai.common.utils.Callback;
 import smai.data.datasources.AnimationDataSource;
 import smai.data.repositories.AnimationRepository;
-import smai.data.datasources.SearchLocalDataSource;
-import smai.data.repositories.SearchMethodsRepository;
+import smai.data.datasources.UninformedSearchLocalDataSource;
+import smai.data.repositories.UninformedSearchesRepository;
 import smai.domain.Answer;
 import smai.domain.Instance;
 import smai.framework.hanoi.HanoiInstance;
 import smai.domain.SearchMethodItem;
 import smai.common.utils.SearchMethods;
 import smai.common.StatusMessages;
-import smai.data.datasources.AnimationListener;
+import smai.common.utils.AnimationListener;
+import smai.data.datasources.InformedSearchLocalDataSource;
 import smai.data.renders.StepAnimation;
+import smai.data.repositories.InformedSearchesRepository;
+import smai.data.searches.AStarSearchDataSource;
 import smai.data.searches.BreadthSearchDataSource;
 import smai.data.searches.DepthSearchDataSource;
+import smai.domain.Heuristic;
+import smai.domain.SearchType;
+import smai.framework.hanoi.HanoiHeuristic;
 import smai.usecases.AnimationControlUseCase;
-import smai.usecases.ResolveUseCase;
+import smai.usecases.ResolveInformedUseCase;
+import smai.usecases.ResolveUninformedUseCase;
 
 public class Main extends javax.swing.JFrame implements Callback<Answer>, AnimationListener {
 
-    private SearchMethodsRepository searchRepository;
-    private ResolveUseCase resolveUseCase;
+    private UninformedSearchesRepository uninformedSearchesRepository;
+    private ResolveUninformedUseCase resolveUninformedUseCase;
+
+    private InformedSearchesRepository informedSearchesRepository;
+    private ResolveInformedUseCase resolveInformedUseCase;
 
     private final AnimationDataSource animatorDataSource;
     private final AnimationRepository animationRepository;
     private final AnimationControlUseCase animationControlUseCase;
-    
+    private final Heuristic heuristic;
+
     private Answer answer;
     private boolean autoPlay;
     private boolean isPlaying;
     private boolean isAnimatingResponse;
 
     public Main() {
+        this.heuristic = new HanoiHeuristic();
+        
         this.animatorDataSource = new StepAnimation(this);
         this.animationRepository = new AnimationRepository(animatorDataSource);
         this.animationControlUseCase = new AnimationControlUseCase(animationRepository);
@@ -46,23 +59,23 @@ public class Main extends javax.swing.JFrame implements Callback<Answer>, Animat
         this.autoPlay = true;
         this.isPlaying = false;
         this.isAnimatingResponse = false;
-        
+
         initComponents();
         initUI();
         initAlgorithms();
     }
-    
-    private void initUI() {        
+
+    private void initUI() {
         ImageIcon icon = new ImageIcon(Assets.ICON);
         setIconImage(icon.getImage());
 
         DefaultCaret caret = (DefaultCaret) this.taConsole.getCaret();
         caret.setUpdatePolicy(ALWAYS_UPDATE);
-        
+
         enableControls(true);
         enabledMediaControls(false);
         enableLoader(false, StatusMessages.STAND_BY);
-        
+
         setColor(Color.white);
     }
 
@@ -76,10 +89,15 @@ public class Main extends javax.swing.JFrame implements Callback<Answer>, Animat
         this.btnCleanConsole.setBackground(color);
         this.btnResetAnimation.setBackground(color);
     }
-    
-    private void setSearchMethod(SearchLocalDataSource localDataSource) {
-        this.searchRepository = new SearchMethodsRepository(localDataSource);
-        this.resolveUseCase = new ResolveUseCase(searchRepository);
+
+    private void setUninformedSearch(UninformedSearchLocalDataSource localDataSource) {
+        this.uninformedSearchesRepository = new UninformedSearchesRepository(localDataSource);
+        this.resolveUninformedUseCase = new ResolveUninformedUseCase(uninformedSearchesRepository);
+    }
+
+    private void setInformedSearch(InformedSearchLocalDataSource localDataSource) {
+        this.informedSearchesRepository = new InformedSearchesRepository(localDataSource);
+        this.resolveInformedUseCase = new ResolveInformedUseCase(informedSearchesRepository);
     }
 
     private void initAlgorithms() {
@@ -93,15 +111,17 @@ public class Main extends javax.swing.JFrame implements Callback<Answer>, Animat
     private void instanceSearchMethod(SearchMethodItem method) {
         switch (method.getKey()) {
             case SearchMethods.DEPTH:
-                this.setSearchMethod(new DepthSearchDataSource());
+                this.setUninformedSearch(new DepthSearchDataSource());
                 break;
 
             case SearchMethods.BREADTH:
-                this.setSearchMethod(new BreadthSearchDataSource());
+                this.setUninformedSearch(new BreadthSearchDataSource());
                 break;
+                
+            case SearchMethods.A_STAR:
+                this.setInformedSearch(new AStarSearchDataSource());
+            break;
 
-            default:
-                this.setSearchMethod(new DepthSearchDataSource());
         }
     }
 
@@ -116,81 +136,111 @@ public class Main extends javax.swing.JFrame implements Callback<Answer>, Animat
         this.btnRun.setEnabled(enabled);
         this.miRun.setEnabled(enabled);
         this.cbSearchMethods.setEnabled(enabled);
-        this.cbNumberOfDisks.setEnabled(enabled);
+        this.sNumberOfDisks.setEnabled(enabled);
     }
-        
+
     private void enableLoader(boolean enabled, String status) {
         this.progressBar.setIndeterminate(enabled);
         this.progressBar.setVisible(enabled);
         this.lStatus.setText(status);
     }
 
-    private void animateResponse() {  
-        if (this.answer == null) return;
-        
+    private void animateResponse() {
+        if (this.answer == null) {
+            return;
+        }
+
         animationControlUseCase.play(this.answer, this.animationPanel);
-        
+
         this.isPlaying = true;
         this.isAnimatingResponse = true;
-        
+
         enabledMediaControls(true);
         enableControls(false);
         enableLoader(true, StatusMessages.PLAYING_ANIMATION);
-        
+
         toggleMediaIcons();
     }
-    
+
     private void play() {
         this.isPlaying = true;
-            
+
         enabledMediaControls(true);
         enableControls(false);
         enableLoader(true, StatusMessages.PLAYING_ANIMATION);
-        
+
         animationControlUseCase.play();
         toggleMediaIcons();
     }
-    
+
     private void pause() {
         this.isPlaying = false;
-            
+
         enabledMediaControls(true);
         enableControls(true);
         enableLoader(false, StatusMessages.ANIMATION_PAUSED);
-        
+
         animationControlUseCase.pause();
         toggleMediaIcons();
     }
-    
+
     private Instance getInstance() {
         try {
-            SearchMethodItem selectedMethods = (SearchMethodItem) this.cbSearchMethods.getSelectedItem();
-            this.instanceSearchMethod(selectedMethods);
-            int numberOfDisks = Integer.parseInt(this.cbNumberOfDisks.getSelectedItem().toString());
+            int numberOfDisks = Integer.parseInt(this.sNumberOfDisks.getValue().toString());
             return new HanoiInstance(numberOfDisks);
         } catch (Exception e) {
             return null;
         }
     }
 
-    private void run() {
-        HanoiInstance instance = (HanoiInstance) this.getInstance();
+    private SearchMethodItem getSelectedMethod() {
+        try {
+            return (SearchMethodItem) this.cbSearchMethods.getSelectedItem();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+    
+    private void runUninformed(Instance instance) {
+        resolveUninformedUseCase.invoke(instance, this);
+    }
 
-        if (instance != null) {
+    private void runInformed(Instance instance) {
+        resolveInformedUseCase.invoke(instance, this.heuristic, this);
+    }
+    
+    private void run(Instance instance, SearchType searchType) {
+        switch (searchType) {
+            case INFORMED:
+                runInformed(instance);
+                break;
+                
+            case UNINFORMED:
+                runUninformed(instance);
+                break;
+        }
+    }
+
+    private void run() {
+        HanoiInstance instance = (HanoiInstance) getInstance();
+        SearchMethodItem selectedMethod = getSelectedMethod();
+
+        if (instance != null && selectedMethod != null) {
+            instanceSearchMethod(selectedMethod);
+            
             this.answer = null;
             this.isAnimatingResponse = false;
-            
+
             enableControls(false);
             enabledMediaControls(false);
             enableLoader(true, StatusMessages.RUNNING);
-            
-            resolveUseCase.invoke(instance, this);
+
+            run(instance, selectedMethod.getType());
         } else {
             this.loge("Could not create instance");
         }
-
     }
-    
+
     private void toggleMediaIcons() {
         if (this.isPlaying) {
             this.btnPlay.setIcon(new ImageIcon(Assets.IC_PAUSE));
@@ -209,21 +259,21 @@ public class Main extends javax.swing.JFrame implements Callback<Answer>, Animat
         }
 
         if (!isAnimatingResponse) {
-           this.animateResponse();
-        } else {            
+            this.animateResponse();
+        } else {
             if (!isPlaying) {
                 this.play();
             } else {
                 this.pause();
             }
         }
-        
+
     }
 
     private void closeWindow() {
         this.dispose();
     }
-    
+
     private void log(String message) {
         this.taConsole.append(message + "\n");
     }
@@ -245,7 +295,7 @@ public class Main extends javax.swing.JFrame implements Callback<Answer>, Animat
         enableControls(true);
         enabledMediaControls(true);
         enableLoader(false, StatusMessages.STAND_BY);
-        
+
         if (result == null) {
             this.log("Something went grown, please try again.");
             return;
@@ -260,12 +310,13 @@ public class Main extends javax.swing.JFrame implements Callback<Answer>, Animat
     }
 
     @Override
-    public void onFailed(Exception error) {
+    public void onFailed(Exception e) {
         enableControls(true);
         enabledMediaControls(false);
         enableLoader(false, StatusMessages.STAND_BY);
-        
-        this.loge(error.toString());
+
+        this.loge(e.toString());
+        e.printStackTrace();
     }
 
     @Override
@@ -280,8 +331,9 @@ public class Main extends javax.swing.JFrame implements Callback<Answer>, Animat
         enableControls(true);
         enabledMediaControls(true);
         enableLoader(false, StatusMessages.STAND_BY);
-        
+
         this.loge(e.toString());
+        e.printStackTrace();
     }
 
     @SuppressWarnings("unchecked")
@@ -302,14 +354,14 @@ public class Main extends javax.swing.JFrame implements Callback<Answer>, Animat
         jLabel1 = new javax.swing.JLabel();
         cbSearchMethods = new javax.swing.JComboBox();
         jLabel2 = new javax.swing.JLabel();
-        cbNumberOfDisks = new javax.swing.JComboBox();
+        sNumberOfDisks = new javax.swing.JSpinner();
         pStatusBar = new javax.swing.JPanel();
         lStatus = new javax.swing.JLabel();
         progressBar = new javax.swing.JProgressBar();
         pMediaControls = new javax.swing.JPanel();
         btnPlay = new javax.swing.JButton();
         btnResetAnimation = new javax.swing.JButton();
-        animationPanel = new smai.framework.hanoi.HanoiPanel();
+        animationPanel = new smai.framework.hanoi.HanoiAnimationPanel();
         jMenuBar2 = new javax.swing.JMenuBar();
         mRun = new javax.swing.JMenu();
         miRun = new javax.swing.JMenuItem();
@@ -351,6 +403,7 @@ public class Main extends javax.swing.JFrame implements Callback<Answer>, Animat
         tbMenu.setRollover(true);
 
         btnRun.setIcon(new javax.swing.ImageIcon(getClass().getResource("/smai/src/play.png"))); // NOI18N
+        btnRun.setToolTipText("Run");
         btnRun.setFocusable(false);
         btnRun.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         btnRun.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -362,6 +415,7 @@ public class Main extends javax.swing.JFrame implements Callback<Answer>, Animat
         tbMenu.add(btnRun);
 
         btnCleanConsole.setIcon(new javax.swing.ImageIcon(getClass().getResource("/smai/src/clean.png"))); // NOI18N
+        btnCleanConsole.setToolTipText("Clean Console");
         btnCleanConsole.setFocusable(false);
         btnCleanConsole.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         btnCleanConsole.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
@@ -377,20 +431,19 @@ public class Main extends javax.swing.JFrame implements Callback<Answer>, Animat
         tbMenu.add(jLabel1);
 
         cbSearchMethods.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        cbSearchMethods.setMaximumSize(new java.awt.Dimension(300, 32767));
+        cbSearchMethods.setPreferredSize(new java.awt.Dimension(300, 27));
         tbMenu.add(cbSearchMethods);
 
         jLabel2.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         jLabel2.setText("  Number of disks:  ");
         tbMenu.add(jLabel2);
 
-        cbNumberOfDisks.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        cbNumberOfDisks.setModel(new javax.swing.DefaultComboBoxModel(new String[] { "6", "7", "10", "11" }));
-        cbNumberOfDisks.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                cbNumberOfDisksActionPerformed(evt);
-            }
-        });
-        tbMenu.add(cbNumberOfDisks);
+        sNumberOfDisks.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        sNumberOfDisks.setModel(new javax.swing.SpinnerNumberModel(Integer.valueOf(3), Integer.valueOf(3), null, Integer.valueOf(1)));
+        sNumberOfDisks.setMaximumSize(new java.awt.Dimension(60, 28));
+        sNumberOfDisks.setPreferredSize(new java.awt.Dimension(60, 28));
+        tbMenu.add(sNumberOfDisks);
 
         javax.swing.GroupLayout pStatusBarLayout = new javax.swing.GroupLayout(pStatusBar);
         pStatusBar.setLayout(pStatusBarLayout);
@@ -416,6 +469,7 @@ public class Main extends javax.swing.JFrame implements Callback<Answer>, Animat
         pMediaControls.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(153, 153, 153), 1, true));
 
         btnPlay.setIcon(new javax.swing.ImageIcon(getClass().getResource("/smai/src/play.png"))); // NOI18N
+        btnPlay.setToolTipText("Play/Pause Animation");
         btnPlay.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnPlayActionPerformed(evt);
@@ -423,6 +477,7 @@ public class Main extends javax.swing.JFrame implements Callback<Answer>, Animat
         });
 
         btnResetAnimation.setIcon(new javax.swing.ImageIcon(getClass().getResource("/smai/src/replay.png"))); // NOI18N
+        btnResetAnimation.setToolTipText("Restart animation");
         btnResetAnimation.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 btnResetAnimationActionPerformed(evt);
@@ -600,10 +655,6 @@ public class Main extends javax.swing.JFrame implements Callback<Answer>, Animat
         this.run();
     }//GEN-LAST:event_miRunActionPerformed
 
-    private void cbNumberOfDisksActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbNumberOfDisksActionPerformed
-        // TODO add your handling code here:
-    }//GEN-LAST:event_cbNumberOfDisksActionPerformed
-
     private void miPlayActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_miPlayActionPerformed
         this.toggleAnimation();
     }//GEN-LAST:event_miPlayActionPerformed
@@ -646,13 +697,12 @@ public class Main extends javax.swing.JFrame implements Callback<Answer>, Animat
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private smai.framework.hanoi.HanoiPanel animationPanel;
+    private smai.framework.hanoi.HanoiAnimationPanel animationPanel;
     private javax.swing.JButton btnCleanConsole;
     private javax.swing.JButton btnPlay;
     private javax.swing.JButton btnResetAnimation;
     private javax.swing.JButton btnRun;
     private javax.swing.JCheckBoxMenuItem cbAutoPlay;
-    private javax.swing.JComboBox cbNumberOfDisks;
     private javax.swing.JComboBox cbSearchMethods;
     private javax.swing.JCheckBoxMenuItem jCheckBoxMenuItem2;
     private javax.swing.JLabel jLabel1;
@@ -677,6 +727,7 @@ public class Main extends javax.swing.JFrame implements Callback<Answer>, Animat
     private javax.swing.JPanel pMediaControls;
     private javax.swing.JPanel pStatusBar;
     private javax.swing.JProgressBar progressBar;
+    private javax.swing.JSpinner sNumberOfDisks;
     private javax.swing.JTextArea taConsole;
     private javax.swing.JToolBar tbMenu;
     // End of variables declaration//GEN-END:variables

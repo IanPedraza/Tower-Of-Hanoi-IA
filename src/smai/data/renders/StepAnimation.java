@@ -2,7 +2,7 @@ package smai.data.renders;
 
 import java.util.LinkedList;
 import smai.data.datasources.AnimationDataSource;
-import smai.data.datasources.AnimationListener;
+import smai.common.utils.AnimationListener;
 import smai.domain.Instance;
 import smai.domain.Node;
 

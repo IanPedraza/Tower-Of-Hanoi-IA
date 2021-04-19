@@ -1,4 +1,4 @@
-package smai.data.datasources;
+package smai.common.utils;
 
 public interface AnimationListener {
     public void onAnimationComplete();
