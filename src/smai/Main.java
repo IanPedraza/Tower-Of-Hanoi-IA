@@ -407,6 +407,7 @@ public class Main extends javax.swing.JFrame implements Callback<Response>, Anim
         tbMenu = new javax.swing.JToolBar();
         btnRun = new javax.swing.JButton();
         btnCleanConsole = new javax.swing.JButton();
+        jSeparator1 = new javax.swing.JToolBar.Separator();
         jLabel1 = new javax.swing.JLabel();
         cbSearchMethods = new javax.swing.JComboBox();
         jLabel2 = new javax.swing.JLabel();
@@ -482,13 +483,13 @@ public class Main extends javax.swing.JFrame implements Callback<Response>, Anim
             }
         });
         tbMenu.add(btnCleanConsole);
+        tbMenu.add(jSeparator1);
 
         jLabel1.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         jLabel1.setText("  Search Method:  ");
         tbMenu.add(jLabel1);
 
         cbSearchMethods.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        cbSearchMethods.setMaximumSize(new java.awt.Dimension(300, 32767));
         cbSearchMethods.setPreferredSize(new java.awt.Dimension(300, 27));
         tbMenu.add(cbSearchMethods);
 
@@ -785,6 +786,7 @@ public class Main extends javax.swing.JFrame implements Callback<Response>, Anim
     private javax.swing.JMenuItem jMenuItem2;
     private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JToolBar.Separator jSeparator1;
     private javax.swing.JPopupMenu.Separator jSeparator5;
     private javax.swing.JLabel lStatus;
     private javax.swing.JMenu mRun;
