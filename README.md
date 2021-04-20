@@ -57,7 +57,7 @@ That's all! You have added a new method 🥳
 3. Create your operators implementing **Operator** interface.
 4. Create your instance extending **Instance** here you have to set the initial state, final state, operators and any data you need
 5. If apply create the **heuristic** implementing **Heuristic**
-6. Finally you should create your animation extending from **AnimationPanel** overriding the paint component method, implementing AnimationPanel you going to have the step and the instance to render every frame in paint component.
+6. Finally, you should create your animation extending from **AnimationPanel** overriding the paint component method, implementing AnimationPanel you going to have the step and the instance to render every frame in paint component.
 
 That's all! You have all the needed to implement a new problem! 🥳
 
