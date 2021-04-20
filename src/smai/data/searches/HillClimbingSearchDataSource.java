@@ -41,8 +41,11 @@ public class HillClimbingSearchDataSource extends InformedSearchLocalDataSource 
             
             for (Successor successor : currentNode.getState().getSuccessors(instance.getOperators())) {
                 HeuristicNode successorNode = new HeuristicNode(successor.getState(), currentNode, successor.getOperator());
-                int h = heuristic.getHeuristic(successor.getState());
-                successorNode.setHeuristic(h); 
+                int h = heuristic.getHeuristic(successorNode.getState());
+                int costApplyOperator = heuristic.getCostOfApplyOperator(successorNode.getState(), successorNode.getOperator());
+
+                successorNode.setPathCost(currentNode.getPathCost() + costApplyOperator);
+                successorNode.setHeuristic(h);
                 successors.add(successorNode);
             }
             

@@ -11,9 +11,14 @@ public abstract class AnimationDataSource implements Runnable {
     protected AnimationPanel canvas;
     protected AnimationListener callback;
 
+    private int fps;
+    private int delay;
+    
     protected AnimationDataSource(AnimationListener callback) {
         this.callback = callback;
         thread = new Thread(this);
+        this.fps = 10;
+        this.setDelay();
     }
 
     protected abstract void start();
@@ -25,6 +30,13 @@ public abstract class AnimationDataSource implements Runnable {
     public abstract void resume();
 
     protected abstract void stop();
+    
+    @Override
+    public final void run() {
+        start();
+        render();
+        callback.onAnimationComplete();
+    }
 
     public final void play() {
         if (response == null || canvas == null) {
@@ -55,12 +67,26 @@ public abstract class AnimationDataSource implements Runnable {
         stop();
         thread.join();
     }
+    
+    public void setFps(int fps) {
+        this.fps = fps;
+        setDelay();
+    }
 
-    @Override
-    public final void run() {
-        start();
-        render();
-        callback.onAnimationComplete();
+    public int getFps() {
+        return fps;
+    }
+
+    private void setDelay() {
+        this.delay = (int) (1000 / fps);
+    }
+
+    protected void sleep() {
+        try {
+            Thread.sleep(delay);
+        } catch (InterruptedException ex) {
+            // ignored
+        }
     }
 
 }

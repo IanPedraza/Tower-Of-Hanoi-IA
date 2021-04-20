@@ -1,5 +1,7 @@
 package smai.domain;
 
+import smai.common.SearchType;
+
 public class SearchMethodItem {
 
     private int key;

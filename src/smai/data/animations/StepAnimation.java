@@ -8,17 +8,13 @@ import smai.domain.Node;
 
 public class StepAnimation extends AnimationDataSource {
 
-    private int fps;
-    private int delay;
     private boolean isPaused;
     private boolean hasFinished;
 
     public StepAnimation(AnimationListener callback) {
         super(callback);
-        this.fps = 10;
         this.isPaused = false;
         this.hasFinished = false;
-        this.setDelay();
     }
 
     @Override
@@ -58,27 +54,6 @@ public class StepAnimation extends AnimationDataSource {
     protected void stop() {
         this.hasFinished = true;
         this.isPaused = true;
-    }
-
-    public void setFps(int fps) {
-        this.fps = fps;
-        setDelay();
-    }
-
-    public int getFps() {
-        return fps;
-    }
-
-    private void setDelay() {
-        this.delay = (int) (1000 / fps);
-    }
-
-    private void sleep() {
-        try {
-            Thread.sleep(delay);
-        } catch (InterruptedException ex) {
-            // ignored
-        }
     }
 
     private void render(Node step, Instance instance) {

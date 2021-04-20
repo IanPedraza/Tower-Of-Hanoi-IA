@@ -1,7 +1,6 @@
 package smai.common;
 
 import smai.domain.SearchMethodItem;
-import smai.domain.SearchType;
 
 public class SearchMethods {
     

@@ -2,6 +2,7 @@ package smai;
 
 import java.awt.Color;
 import javax.swing.ImageIcon;
+import javax.swing.JOptionPane;
 import javax.swing.text.DefaultCaret;
 import static javax.swing.text.DefaultCaret.ALWAYS_UPDATE;
 import smai.common.Assets;
@@ -27,7 +28,7 @@ import smai.data.searches.DepthSearchDataSource;
 import smai.data.searches.HillClimbingSearchDataSource;
 import smai.data.searches.OptimalSearchDataSource;
 import smai.domain.Heuristic;
-import smai.domain.SearchType;
+import smai.common.SearchType;
 import smai.framework.hanoi.HanoiHeuristic;
 import smai.usecases.AnimationControlUseCase;
 import smai.usecases.ResolveInformedUseCase;
@@ -177,6 +178,24 @@ public class Main extends javax.swing.JFrame implements Callback<Response>, Anim
         progressBar.setIndeterminate(enabled);
         progressBar.setVisible(enabled);
         lStatus.setText(status);
+    }
+    
+    private void setFPS(int fps) {
+        animatorDataSource.setFps(fps);
+    }
+    
+    private void changeFPS() {
+        String inputFPS = JOptionPane.showInputDialog("Frames per second:", animatorDataSource.getFps());
+        
+        if (inputFPS != null) {
+            try {
+                int fps = Integer.parseInt(inputFPS);
+                setFPS(fps);
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(this, "The amount of FPS should be a number", "Invalid input", JOptionPane.WARNING_MESSAGE);
+            }
+        }
+        
     }
 
     private void animateResponse() {
@@ -407,6 +426,7 @@ public class Main extends javax.swing.JFrame implements Callback<Response>, Anim
         miPlay = new javax.swing.JMenuItem();
         miReplay = new javax.swing.JMenuItem();
         jSeparator5 = new javax.swing.JPopupMenu.Separator();
+        jMenuItem3 = new javax.swing.JMenuItem();
         cbAutoPlay = new javax.swing.JCheckBoxMenuItem();
         jMenu4 = new javax.swing.JMenu();
         miExit = new javax.swing.JMenuItem();
@@ -604,6 +624,14 @@ public class Main extends javax.swing.JFrame implements Callback<Response>, Anim
         jMenu3.add(miReplay);
         jMenu3.add(jSeparator5);
 
+        jMenuItem3.setText("FPS");
+        jMenuItem3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jMenuItem3ActionPerformed(evt);
+            }
+        });
+        jMenu3.add(jMenuItem3);
+
         cbAutoPlay.setSelected(true);
         cbAutoPlay.setText("Auto Play Animation");
         cbAutoPlay.addActionListener(new java.awt.event.ActionListener() {
@@ -708,6 +736,10 @@ public class Main extends javax.swing.JFrame implements Callback<Response>, Anim
         animateResponse();
     }//GEN-LAST:event_miReplayActionPerformed
 
+    private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jMenuItem3ActionPerformed
+        changeFPS();
+    }//GEN-LAST:event_jMenuItem3ActionPerformed
+
     public static void main(String args[]) {
         try {
             for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
@@ -751,6 +783,7 @@ public class Main extends javax.swing.JFrame implements Callback<Response>, Anim
     private javax.swing.JMenuBar jMenuBar2;
     private javax.swing.JMenuItem jMenuItem1;
     private javax.swing.JMenuItem jMenuItem2;
+    private javax.swing.JMenuItem jMenuItem3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JPopupMenu.Separator jSeparator5;
     private javax.swing.JLabel lStatus;

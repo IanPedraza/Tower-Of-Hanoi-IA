@@ -96,6 +96,10 @@ public class Response {
             value += "Solved success.\n";
             value += (path.size() - 1) + " stepts found.\n";
             value += this.getAnalyzedNodes() + " nodes analyzed\n";
+            
+            if (path.get(path.size() - 1) instanceof HeuristicNode) {
+                value += "Path cost: " + ((HeuristicNode) path.get(path.size() - 1)).getPathCost() + "\n";
+            }
         }
 
         value += getElapsedTime() + " ms";

@@ -55,7 +55,10 @@ public class BestFirstSearchDataSource extends InformedSearchLocalDataSource {
 
                 if (!open.contains(successorNode) && !closed.contains(successorNode)) {
                     int h = heuristic.getHeuristic(successorNode.getState());
-                    successorNode.setHeuristic(h);                    
+                    int costApplyOperator = heuristic.getCostOfApplyOperator(successorNode.getState(), successorNode.getOperator());
+
+                    successorNode.setPathCost(currentNode.getPathCost() + costApplyOperator);
+                    successorNode.setHeuristic(h);
                     successors.add(successorNode);
                 }
             }

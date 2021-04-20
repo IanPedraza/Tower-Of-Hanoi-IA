@@ -54,8 +54,11 @@ public class OptimalSearchDataSource extends InformedSearchLocalDataSource {
                 HeuristicNode successorNode = new HeuristicNode(successor.getState(), currentNode, successor.getOperator());
 
                 if (!open.contains(successorNode) && !closed.contains(successorNode)) {
+                    int h = heuristic.getHeuristic(successorNode.getState());
                     int costApplyOperator = heuristic.getCostOfApplyOperator(successorNode.getState(), successorNode.getOperator());
+                    
                     successorNode.setPathCost(currentNode.getPathCost() + costApplyOperator);
+                    successorNode.setHeuristic(h);
                     successors.add(successorNode);
                 }
             }
