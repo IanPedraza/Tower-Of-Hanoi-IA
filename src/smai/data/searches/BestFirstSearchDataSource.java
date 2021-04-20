@@ -12,13 +12,13 @@ import smai.domain.HeuristicNode;
 import smai.domain.Instance;
 import smai.domain.Successor;
 
-public class AStarSearchDataSource extends InformedSearchLocalDataSource {
+public class BestFirstSearchDataSource extends InformedSearchLocalDataSource {
 
     private final Comparator comparator;
     
-    public AStarSearchDataSource() {
+    public BestFirstSearchDataSource() {
         comparator = (Comparator<HeuristicNode>) (HeuristicNode o1, HeuristicNode o2) -> {
-            return ((Integer) o1.getPathCostPlusHeuristic()).compareTo((Integer) o2.getPathCostPlusHeuristic());
+            return ((Integer) o1.getHeuristic()).compareTo((Integer) o2.getHeuristic());
         };
     }
     
@@ -55,11 +55,7 @@ public class AStarSearchDataSource extends InformedSearchLocalDataSource {
 
                 if (!open.contains(successorNode) && !closed.contains(successorNode)) {
                     int h = heuristic.getHeuristic(successorNode.getState());
-                    int costApplyOperator = heuristic.getCostOfApplyOperator(successorNode.getState(), successorNode.getOperator());
-                    
-                    successorNode.setPathCost(currentNode.getPathCost() + costApplyOperator);
-                    successorNode.setHeuristic(h);
-                    
+                    successorNode.setHeuristic(h);                    
                     successors.add(successorNode);
                 }
             }

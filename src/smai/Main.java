@@ -21,6 +21,7 @@ import smai.data.datasources.InformedSearchLocalDataSource;
 import smai.data.animations.StepAnimation;
 import smai.data.repositories.InformedSearchesRepository;
 import smai.data.searches.AStarSearchDataSource;
+import smai.data.searches.BestFirstSearchDataSource;
 import smai.data.searches.BreadthSearchDataSource;
 import smai.data.searches.DepthSearchDataSource;
 import smai.domain.Heuristic;
@@ -42,6 +43,7 @@ public class Main extends javax.swing.JFrame implements Callback<Response>, Anim
     private final ResolveInformedUseCase resolveInformedUseCase;
 
     private final AStarSearchDataSource aStarSearchDataSource;
+    private final BestFirstSearchDataSource bestFirstSearchDataSource;
 
     private final AnimationDataSource animatorDataSource;
     private final AnimationRepository animationRepository;
@@ -58,10 +60,13 @@ public class Main extends javax.swing.JFrame implements Callback<Response>, Anim
 
         depthSearchDataSource = new DepthSearchDataSource();
         breadthSearchDataSource = new BreadthSearchDataSource();
+        
         uninformedSearchesRepository = new UninformedSearchesRepository(depthSearchDataSource);
         resolveUninformedUseCase = new ResolveUninformedUseCase(uninformedSearchesRepository);
 
         aStarSearchDataSource = new AStarSearchDataSource();
+        bestFirstSearchDataSource = new BestFirstSearchDataSource();
+        
         informedSearchesRepository = new InformedSearchesRepository(aStarSearchDataSource);
         resolveInformedUseCase = new ResolveInformedUseCase(informedSearchesRepository);
 
@@ -133,7 +138,10 @@ public class Main extends javax.swing.JFrame implements Callback<Response>, Anim
             case SearchMethods.A_STAR:
                 setInformedSearch(aStarSearchDataSource);
                 break;
-
+                
+            case SearchMethods.BEST_FIRST:
+                setInformedSearch(bestFirstSearchDataSource);
+                break;
         }
     }
 
