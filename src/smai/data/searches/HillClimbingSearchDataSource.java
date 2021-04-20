@@ -56,7 +56,6 @@ public class HillClimbingSearchDataSource extends InformedSearchLocalDataSource 
     }
     
     private HeuristicNode best(LinkedList<HeuristicNode> nodes, int minHeuristic) {
-        System.out.println("**");
         HeuristicNode best = null;
         
         for (HeuristicNode node : nodes) {

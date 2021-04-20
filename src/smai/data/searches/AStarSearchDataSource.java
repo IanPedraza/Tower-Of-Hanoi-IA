@@ -65,7 +65,7 @@ public class AStarSearchDataSource extends InformedSearchLocalDataSource {
             }
             
             open.addAll(successors);
-            successors.sort(comparator);
+            open.sort(comparator);
         }
 
         if (!response.hasSolution() && open.isEmpty()) {

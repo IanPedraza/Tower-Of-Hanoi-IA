@@ -25,6 +25,7 @@ import smai.data.searches.BestFirstSearchDataSource;
 import smai.data.searches.BreadthSearchDataSource;
 import smai.data.searches.DepthSearchDataSource;
 import smai.data.searches.HillClimbingSearchDataSource;
+import smai.data.searches.OptimalSearchDataSource;
 import smai.domain.Heuristic;
 import smai.domain.SearchType;
 import smai.framework.hanoi.HanoiHeuristic;
@@ -46,6 +47,7 @@ public class Main extends javax.swing.JFrame implements Callback<Response>, Anim
     private final AStarSearchDataSource aStarSearchDataSource;
     private final BestFirstSearchDataSource bestFirstSearchDataSource;
     private final HillClimbingSearchDataSource hillClimbingSearchDataSource;
+    private final OptimalSearchDataSource optimalSearchDataSource;
 
     private final AnimationDataSource animatorDataSource;
     private final AnimationRepository animationRepository;
@@ -69,6 +71,7 @@ public class Main extends javax.swing.JFrame implements Callback<Response>, Anim
         aStarSearchDataSource = new AStarSearchDataSource();
         bestFirstSearchDataSource = new BestFirstSearchDataSource();
         hillClimbingSearchDataSource = new HillClimbingSearchDataSource();
+        optimalSearchDataSource = new OptimalSearchDataSource();
 
         informedSearchesRepository = new InformedSearchesRepository(aStarSearchDataSource);
         resolveInformedUseCase = new ResolveInformedUseCase(informedSearchesRepository);
@@ -148,6 +151,10 @@ public class Main extends javax.swing.JFrame implements Callback<Response>, Anim
 
             case SearchMethods.HILL_CLIMBING:
                 setInformedSearch(hillClimbingSearchDataSource);
+                break;
+                
+            case SearchMethods.OPTIMAL:
+                setInformedSearch(optimalSearchDataSource);
                 break;
         }
     }
