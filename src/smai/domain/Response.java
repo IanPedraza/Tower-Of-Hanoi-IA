@@ -2,23 +2,23 @@ package smai.domain;
 
 import java.util.LinkedList;
 
-public class Answer {
+public class Response {
 
-    private boolean hasAnswer;
+    private boolean hasSolution;
     private Instance instance;
     private long elapsedTime;
     private int analyzedNodes;
     private LinkedList<Node> path;
 
-    public Answer(Instance instance) {
-        this.hasAnswer = false;
+    public Response(Instance instance) {
+        this.hasSolution = false;
         this.analyzedNodes = 0;
         this.path = null;
         this.instance = instance;
     }
     
-    public Answer() {
-        this.hasAnswer = false;
+    public Response() {
+        this.hasSolution = false;
         this.analyzedNodes = 0;
         this.path = null;
         this.instance = null;
@@ -44,12 +44,12 @@ public class Answer {
         this.elapsedTime = elapsedTime;
     }
 
-    public boolean hasAnswer() {
-        return hasAnswer;
+    public boolean hasSolution() {
+        return hasSolution;
     }
 
-    public void hasAnswer(boolean hasAnswer) {
-        this.hasAnswer = hasAnswer;
+    public void hasSolution(boolean hasSolution) {
+        this.hasSolution = hasSolution;
     }
 
     public int getAnalyzedNodes() {
@@ -72,7 +72,7 @@ public class Answer {
     public String toString() {
         String value = "";
 
-        if (!hasAnswer || path == null || path.isEmpty()) {
+        if (!hasSolution || path == null || path.isEmpty()) {
             value += "No path found";
         } else {
             Operator op;

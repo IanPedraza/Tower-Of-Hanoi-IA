@@ -1,7 +1,6 @@
 package smai.common;
 
 public class Assets {
-    // "src/pause.png"
     public static final String ASSETS_PATH = "src/smai/src/";
     public static final String ICON = ASSETS_PATH + "icon.png";
     public static final String IC_PAUSE = ASSETS_PATH + "pause.png";

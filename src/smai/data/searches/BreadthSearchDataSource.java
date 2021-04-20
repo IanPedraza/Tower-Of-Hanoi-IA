@@ -1,10 +1,11 @@
 package smai.data.searches;
 
 import java.util.LinkedList;
-import smai.common.utils.Callback;
+import smai.common.utils.PathFinder;
+import smai.data.Callback;
 import smai.common.utils.TicToc;
 import smai.data.datasources.UninformedSearchLocalDataSource;
-import smai.domain.Answer;
+import smai.domain.Response;
 import smai.domain.Instance;
 import smai.domain.Node;
 import smai.domain.Successor;
@@ -12,10 +13,10 @@ import smai.domain.Successor;
 public class BreadthSearchDataSource extends UninformedSearchLocalDataSource {
 
     @Override
-    public void process(Instance instance, Callback<Answer> callback) {
-        Answer answer = new Answer(instance);
+    public void process(Instance instance, Callback<Response> callback) {
+        Response response = new Response(instance);
 
-        TicToc.getInstance().markStart();
+        TicToc.getInstance().tic();
 
         LinkedList<Node> open = new LinkedList();
         LinkedList<Node> closed = new LinkedList();
@@ -29,11 +30,11 @@ public class BreadthSearchDataSource extends UninformedSearchLocalDataSource {
             closed.add(currentNode);
 
             if (instance.isFinalState(currentNode.getState())) {
-                answer.setPath(findPath(currentNode));
-                answer.hasAnswer(true);
-                answer.setAnalyzedNodes(closed.size());
-                answer.setElapsedTime(TicToc.getInstance().getElapsedTime());
-                callback.onSuccess(answer);
+                response.setElapsedTime(TicToc.getInstance().toc());
+                response.setPath(PathFinder.getInstance().findPath(currentNode));
+                response.hasSolution(true);
+                response.setAnalyzedNodes(closed.size());
+                callback.onSuccess(response);
                 break;
             }
 
@@ -50,9 +51,9 @@ public class BreadthSearchDataSource extends UninformedSearchLocalDataSource {
             open.addAll(successors);
         }
 
-        if (!answer.hasAnswer() && open.isEmpty()) {
-            answer.setElapsedTime(TicToc.getInstance().getElapsedTime());
-            callback.onSuccess(answer);
+        if (!response.hasSolution() && open.isEmpty()) {
+            response.setElapsedTime(TicToc.getInstance().toc());
+            callback.onSuccess(response);
         }
     }
 

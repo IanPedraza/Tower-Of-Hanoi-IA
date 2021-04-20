@@ -1,19 +1,19 @@
 package smai.data.datasources;
 
-import smai.common.utils.AnimationListener;
-import smai.data.renders.AnimationPanel;
-import smai.domain.Answer;
+import smai.data.AnimationListener;
+import smai.data.animations.AnimationPanel;
+import smai.domain.Response;
 
 public abstract class AnimationDataSource implements Runnable {
 
     private Thread thread;
-    protected Answer answer;
+    protected Response response;
     protected AnimationPanel canvas;
     protected AnimationListener callback;
 
     protected AnimationDataSource(AnimationListener callback) {
         this.callback = callback;
-        this.thread = new Thread(this);
+        thread = new Thread(this);
     }
 
     protected abstract void start();
@@ -27,16 +27,16 @@ public abstract class AnimationDataSource implements Runnable {
     protected abstract void stop();
 
     public final void play() {
-        if (this.answer == null || this.canvas == null) {
-            System.out.println("Answer or canvas undefined");
+        if (response == null || canvas == null) {
+            if (callback != null) callback.onAnimationError(new Exception("Response or canvas undefined"));
             return;
         }
 
         this.resume();
     }
 
-    public final void play(Answer answer, AnimationPanel canvas) {
-        this.answer = answer;
+    public final void play(Response response, AnimationPanel canvas) {
+        this.response = response;
         this.canvas = canvas;
 
         try {
@@ -44,24 +44,23 @@ public abstract class AnimationDataSource implements Runnable {
                 kill();
             }
 
-            this.thread = new Thread(this);
+            thread = new Thread(this);
             thread.start();
         } catch (Exception e) {
             this.callback.onAnimationError(e);
         }
-
     }
 
     private void kill() throws InterruptedException {
-        this.stop();
+        stop();
         thread.join();
     }
 
     @Override
     public final void run() {
-        this.start();
-        this.render();
-        this.callback.onAnimationComplete();
+        start();
+        render();
+        callback.onAnimationComplete();
     }
 
 }

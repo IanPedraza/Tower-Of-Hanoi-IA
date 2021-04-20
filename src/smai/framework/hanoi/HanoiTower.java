@@ -17,7 +17,7 @@ public class HanoiTower {
 
     public HanoiTower(int numberOfDisks) {
         this.disks = new LinkedList();
-        this.fill(numberOfDisks);
+        fill(numberOfDisks);
     }
 
     public boolean isEmpty() {
@@ -64,12 +64,11 @@ public class HanoiTower {
         return this.disks.remove(0);
     }
 
-    public void fill(int numberOfDisks) {
+    public final void fill(int numberOfDisks) {
         disks.clear();
 
         for (int index = 1; index <= numberOfDisks; index++) {
             this.addDisk(index);
-
         }
 
     }

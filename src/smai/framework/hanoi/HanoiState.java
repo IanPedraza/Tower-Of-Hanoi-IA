@@ -11,13 +11,12 @@ public class HanoiState extends State {
         this.bTower = new HanoiTower();
         this.cTower = new HanoiTower();
     }
-    
+
     public HanoiState(HanoiState hanoiState) {
         this.aTower = new HanoiTower(hanoiState.getATower());
         this.bTower = new HanoiTower(hanoiState.getBTower());
         this.cTower = new HanoiTower(hanoiState.getCTower());
     }
-
 
     public HanoiState(int disksOnA, int disksOnB, int disksOnC) {
         this.aTower = new HanoiTower(disksOnA);
@@ -74,26 +73,25 @@ public class HanoiState extends State {
     public boolean equals(Object obj) {
         if (obj instanceof HanoiState) {
             HanoiState hanoiState = (HanoiState) obj;
-            
-            return this.aTower.equals(hanoiState.aTower) && 
-                    this.bTower.equals(hanoiState.bTower) && 
-                    this.cTower.equals(hanoiState.cTower);
-        }
-        
-        return false;
-    }    
-    
 
-    @Override
-    public String toString() {
-        return "(" + this.aTower + "), " +
-                "(" + this.bTower + "), " +
-                "(" + this.cTower + ")";
+            return this.aTower.equals(hanoiState.aTower)
+                    && this.bTower.equals(hanoiState.bTower)
+                    && this.cTower.equals(hanoiState.cTower);
+        }
+
+        return false;
     }
 
     @Override
-    public State copy()  {
+    public String toString() {
+        return "(" + this.aTower + "), "
+                + "(" + this.bTower + "), "
+                + "(" + this.cTower + ")";
+    }
+
+    @Override
+    public State copy() {
         return new HanoiState(this);
-    }    
-    
+    }
+
 }

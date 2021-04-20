@@ -2,9 +2,9 @@ package smai.domain;
 
 import java.util.ArrayList;
 
-public abstract class State {    
+public abstract class State {
     public abstract State copy();
-    
+
     public final ArrayList<Successor> getSuccessors(Operator[] operators) {
         ArrayList<Successor> successors = new ArrayList();
 

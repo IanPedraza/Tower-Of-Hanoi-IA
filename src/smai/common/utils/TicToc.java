@@ -17,11 +17,11 @@ public class TicToc {
         return sharedInstance;
     }
     
-    public void markStart() {
+    public void tic() {
         this.startedTime = System.currentTimeMillis();
     }
     
-    public final long getElapsedTime() {
+    public final long toc() {
         return System.currentTimeMillis() - this.startedTime;
     }
     

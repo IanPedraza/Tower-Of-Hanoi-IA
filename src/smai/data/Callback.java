@@ -1,4 +1,4 @@
-package smai.common.utils;
+package smai.data;
 
 public interface Callback<T> {
     public void onSuccess(T result);

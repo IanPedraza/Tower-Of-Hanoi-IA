@@ -1,6 +1,7 @@
 package smai.domain;
 
 public class Successor {
+
     private State state;
     private Operator operator;
 
@@ -8,7 +9,7 @@ public class Successor {
         this.state = state;
         this.operator = operator;
     }
-    
+
     public Successor() {
         this.state = null;
         this.operator = null;
@@ -29,5 +30,5 @@ public class Successor {
     public void setOperator(Operator operator) {
         this.operator = operator;
     }
-    
+
 }

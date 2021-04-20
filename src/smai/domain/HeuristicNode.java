@@ -1,14 +1,14 @@
 package smai.domain;
 
 public class HeuristicNode extends Node {
-    
+
     private int pathCost;
     private int pathCostPlusHeuristic;
 
     public HeuristicNode(State state, Node parent, Operator operator) {
         super(state, parent, operator);
     }
-    
+
     public HeuristicNode(State state) {
         super(state);
         this.pathCost = 0;
@@ -30,5 +30,5 @@ public class HeuristicNode extends Node {
     public void setPathCostPlusHeuristic(int pathCostPlusHeuristic) {
         this.pathCostPlusHeuristic = pathCostPlusHeuristic;
     }
-    
+
 }

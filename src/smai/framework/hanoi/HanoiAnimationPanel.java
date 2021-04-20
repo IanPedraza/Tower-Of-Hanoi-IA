@@ -5,7 +5,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.Rectangle2D;
 import java.util.LinkedList;
-import smai.data.renders.AnimationPanel;
+import smai.data.animations.AnimationPanel;
 
 public class HanoiAnimationPanel extends AnimationPanel {
 
@@ -13,7 +13,6 @@ public class HanoiAnimationPanel extends AnimationPanel {
     private final double ratePostHeigth = 0.7;
     private final double ratePostWidht = 0.0125;
     private final double maxDisksHeigth = 0.75;
-    private final double minDisksRatioWidth = 0.04;   
     
     @Override
     protected void paintComponent(Graphics g) {

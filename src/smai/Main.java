@@ -5,20 +5,20 @@ import javax.swing.ImageIcon;
 import javax.swing.text.DefaultCaret;
 import static javax.swing.text.DefaultCaret.ALWAYS_UPDATE;
 import smai.common.Assets;
-import smai.common.utils.Callback;
+import smai.data.Callback;
 import smai.data.datasources.AnimationDataSource;
 import smai.data.repositories.AnimationRepository;
 import smai.data.datasources.UninformedSearchLocalDataSource;
 import smai.data.repositories.UninformedSearchesRepository;
-import smai.domain.Answer;
+import smai.domain.Response;
 import smai.domain.Instance;
 import smai.framework.hanoi.HanoiInstance;
 import smai.domain.SearchMethodItem;
-import smai.common.utils.SearchMethods;
+import smai.common.SearchMethods;
 import smai.common.StatusMessages;
-import smai.common.utils.AnimationListener;
+import smai.data.AnimationListener;
 import smai.data.datasources.InformedSearchLocalDataSource;
-import smai.data.renders.StepAnimation;
+import smai.data.animations.StepAnimation;
 import smai.data.repositories.InformedSearchesRepository;
 import smai.data.searches.AStarSearchDataSource;
 import smai.data.searches.BreadthSearchDataSource;
@@ -30,35 +30,49 @@ import smai.usecases.AnimationControlUseCase;
 import smai.usecases.ResolveInformedUseCase;
 import smai.usecases.ResolveUninformedUseCase;
 
-public class Main extends javax.swing.JFrame implements Callback<Answer>, AnimationListener {
+public class Main extends javax.swing.JFrame implements Callback<Response>, AnimationListener {
 
-    private UninformedSearchesRepository uninformedSearchesRepository;
-    private ResolveUninformedUseCase resolveUninformedUseCase;
+    private final UninformedSearchesRepository uninformedSearchesRepository;
+    private final ResolveUninformedUseCase resolveUninformedUseCase;
 
-    private InformedSearchesRepository informedSearchesRepository;
-    private ResolveInformedUseCase resolveInformedUseCase;
+    private final DepthSearchDataSource depthSearchDataSource;
+    private final BreadthSearchDataSource breadthSearchDataSource;
+
+    private final InformedSearchesRepository informedSearchesRepository;
+    private final ResolveInformedUseCase resolveInformedUseCase;
+
+    private final AStarSearchDataSource aStarSearchDataSource;
 
     private final AnimationDataSource animatorDataSource;
     private final AnimationRepository animationRepository;
     private final AnimationControlUseCase animationControlUseCase;
     private final Heuristic heuristic;
 
-    private Answer answer;
+    private Response response;
     private boolean autoPlay;
     private boolean isPlaying;
     private boolean isAnimatingResponse;
 
     public Main() {
-        this.heuristic = new HanoiHeuristic();
-        
-        this.animatorDataSource = new StepAnimation(this);
-        this.animationRepository = new AnimationRepository(animatorDataSource);
-        this.animationControlUseCase = new AnimationControlUseCase(animationRepository);
+        heuristic = new HanoiHeuristic();
 
-        this.answer = null;
-        this.autoPlay = true;
-        this.isPlaying = false;
-        this.isAnimatingResponse = false;
+        depthSearchDataSource = new DepthSearchDataSource();
+        breadthSearchDataSource = new BreadthSearchDataSource();
+        uninformedSearchesRepository = new UninformedSearchesRepository(depthSearchDataSource);
+        resolveUninformedUseCase = new ResolveUninformedUseCase(uninformedSearchesRepository);
+
+        aStarSearchDataSource = new AStarSearchDataSource();
+        informedSearchesRepository = new InformedSearchesRepository(aStarSearchDataSource);
+        resolveInformedUseCase = new ResolveInformedUseCase(informedSearchesRepository);
+
+        animatorDataSource = new StepAnimation(this);
+        animationRepository = new AnimationRepository(animatorDataSource);
+        animationControlUseCase = new AnimationControlUseCase(animationRepository);
+
+        response = null;
+        autoPlay = true;
+        isPlaying = false;
+        isAnimatingResponse = false;
 
         initComponents();
         initUI();
@@ -74,7 +88,7 @@ public class Main extends javax.swing.JFrame implements Callback<Answer>, Animat
 
         enableControls(true);
         enabledMediaControls(false);
-        enableLoader(false, StatusMessages.STAND_BY);
+        enableLoader(false, StatusMessages.ON_STAND_BY);
 
         setColor(Color.white);
     }
@@ -91,13 +105,11 @@ public class Main extends javax.swing.JFrame implements Callback<Answer>, Animat
     }
 
     private void setUninformedSearch(UninformedSearchLocalDataSource localDataSource) {
-        this.uninformedSearchesRepository = new UninformedSearchesRepository(localDataSource);
-        this.resolveUninformedUseCase = new ResolveUninformedUseCase(uninformedSearchesRepository);
+        uninformedSearchesRepository.setLocalDataSource(localDataSource);
     }
 
     private void setInformedSearch(InformedSearchLocalDataSource localDataSource) {
-        this.informedSearchesRepository = new InformedSearchesRepository(localDataSource);
-        this.resolveInformedUseCase = new ResolveInformedUseCase(informedSearchesRepository);
+        informedSearchesRepository.setLocalDataSource(localDataSource);
     }
 
     private void initAlgorithms() {
@@ -111,16 +123,16 @@ public class Main extends javax.swing.JFrame implements Callback<Answer>, Animat
     private void instanceSearchMethod(SearchMethodItem method) {
         switch (method.getKey()) {
             case SearchMethods.DEPTH:
-                this.setUninformedSearch(new DepthSearchDataSource());
+                setUninformedSearch(depthSearchDataSource);
                 break;
 
             case SearchMethods.BREADTH:
-                this.setUninformedSearch(new BreadthSearchDataSource());
+                setUninformedSearch(breadthSearchDataSource);
                 break;
-                
+
             case SearchMethods.A_STAR:
-                this.setInformedSearch(new AStarSearchDataSource());
-            break;
+                setInformedSearch(aStarSearchDataSource);
+                break;
 
         }
     }
@@ -133,31 +145,31 @@ public class Main extends javax.swing.JFrame implements Callback<Answer>, Animat
     }
 
     private void enableControls(boolean enabled) {
-        this.btnRun.setEnabled(enabled);
-        this.miRun.setEnabled(enabled);
-        this.cbSearchMethods.setEnabled(enabled);
-        this.sNumberOfDisks.setEnabled(enabled);
+        btnRun.setEnabled(enabled);
+        miRun.setEnabled(enabled);
+        cbSearchMethods.setEnabled(enabled);
+        sNumberOfDisks.setEnabled(enabled);
     }
 
     private void enableLoader(boolean enabled, String status) {
-        this.progressBar.setIndeterminate(enabled);
-        this.progressBar.setVisible(enabled);
-        this.lStatus.setText(status);
+        progressBar.setIndeterminate(enabled);
+        progressBar.setVisible(enabled);
+        lStatus.setText(status);
     }
 
     private void animateResponse() {
-        if (this.answer == null) {
+        if (response == null) {
             return;
         }
 
-        animationControlUseCase.play(this.answer, this.animationPanel);
+        animationControlUseCase.play(this.response, this.animationPanel);
 
         this.isPlaying = true;
         this.isAnimatingResponse = true;
 
         enabledMediaControls(true);
         enableControls(false);
-        enableLoader(true, StatusMessages.PLAYING_ANIMATION);
+        enableLoader(true, StatusMessages.ON_PLAYING_ANIMATION);
 
         toggleMediaIcons();
     }
@@ -167,7 +179,7 @@ public class Main extends javax.swing.JFrame implements Callback<Answer>, Animat
 
         enabledMediaControls(true);
         enableControls(false);
-        enableLoader(true, StatusMessages.PLAYING_ANIMATION);
+        enableLoader(true, StatusMessages.ON_PLAYING_ANIMATION);
 
         animationControlUseCase.play();
         toggleMediaIcons();
@@ -178,7 +190,7 @@ public class Main extends javax.swing.JFrame implements Callback<Answer>, Animat
 
         enabledMediaControls(true);
         enableControls(true);
-        enableLoader(false, StatusMessages.ANIMATION_PAUSED);
+        enableLoader(false, StatusMessages.ON_ANIMATION_PAUSED);
 
         animationControlUseCase.pause();
         toggleMediaIcons();
@@ -200,7 +212,7 @@ public class Main extends javax.swing.JFrame implements Callback<Answer>, Animat
             return null;
         }
     }
-    
+
     private void runUninformed(Instance instance) {
         resolveUninformedUseCase.invoke(instance, this);
     }
@@ -208,13 +220,13 @@ public class Main extends javax.swing.JFrame implements Callback<Answer>, Animat
     private void runInformed(Instance instance) {
         resolveInformedUseCase.invoke(instance, this.heuristic, this);
     }
-    
+
     private void run(Instance instance, SearchType searchType) {
         switch (searchType) {
             case INFORMED:
                 runInformed(instance);
                 break;
-                
+
             case UNINFORMED:
                 runUninformed(instance);
                 break;
@@ -227,13 +239,13 @@ public class Main extends javax.swing.JFrame implements Callback<Answer>, Animat
 
         if (instance != null && selectedMethod != null) {
             instanceSearchMethod(selectedMethod);
-            
-            this.answer = null;
-            this.isAnimatingResponse = false;
+
+            response = null;
+            isAnimatingResponse = false;
 
             enableControls(false);
             enabledMediaControls(false);
-            enableLoader(true, StatusMessages.RUNNING);
+            enableLoader(true, StatusMessages.ON_RUNNING);
 
             run(instance, selectedMethod.getType());
         } else {
@@ -254,7 +266,7 @@ public class Main extends javax.swing.JFrame implements Callback<Answer>, Animat
     }
 
     private void toggleAnimation() {
-        if (this.answer == null) {
+        if (this.response == null) {
             return;
         }
 
@@ -291,18 +303,18 @@ public class Main extends javax.swing.JFrame implements Callback<Answer>, Animat
     }
 
     @Override
-    public void onSuccess(Answer result) {
+    public void onSuccess(Response result) {
         enableControls(true);
         enabledMediaControls(true);
-        enableLoader(false, StatusMessages.STAND_BY);
+        enableLoader(false, StatusMessages.ON_STAND_BY);
 
         if (result == null) {
             this.log("Something went grown, please try again.");
             return;
         }
 
-        this.answer = result;
-        this.log(answer.toString());
+        this.response = result;
+        this.log(response.toString());
 
         if (this.autoPlay) {
             this.animateResponse();
@@ -313,10 +325,9 @@ public class Main extends javax.swing.JFrame implements Callback<Answer>, Animat
     public void onFailed(Exception e) {
         enableControls(true);
         enabledMediaControls(false);
-        enableLoader(false, StatusMessages.STAND_BY);
+        enableLoader(false, StatusMessages.ON_STAND_BY);
 
         this.loge(e.toString());
-        e.printStackTrace();
     }
 
     @Override
@@ -330,10 +341,9 @@ public class Main extends javax.swing.JFrame implements Callback<Answer>, Animat
     public void onAnimationError(Exception e) {
         enableControls(true);
         enabledMediaControls(true);
-        enableLoader(false, StatusMessages.STAND_BY);
+        enableLoader(false, StatusMessages.ON_STAND_BY);
 
         this.loge(e.toString());
-        e.printStackTrace();
     }
 
     @SuppressWarnings("unchecked")

@@ -1,8 +1,8 @@
-package smai.data.renders;
+package smai.data.animations;
 
 import java.util.LinkedList;
 import smai.data.datasources.AnimationDataSource;
-import smai.common.utils.AnimationListener;
+import smai.data.AnimationListener;
 import smai.domain.Instance;
 import smai.domain.Node;
 
@@ -30,11 +30,11 @@ public class StepAnimation extends AnimationDataSource {
     @Override
     public void render() {
         LinkedList<Node> path = new LinkedList();
-        path.addAll(answer.getPath());       
+        path.addAll(response.getPath());
 
         while (!hasFinished) {
             while (!isPaused && !path.isEmpty()) {
-                render(path.removeFirst(), answer.getInstance());
+                render(path.removeFirst(), response.getInstance());
                 sleep();
             }
 
@@ -43,7 +43,7 @@ public class StepAnimation extends AnimationDataSource {
             }
         }
     }
-    
+
     @Override
     public void pause() {
         this.isPaused = true;
@@ -68,7 +68,7 @@ public class StepAnimation extends AnimationDataSource {
     public int getFps() {
         return fps;
     }
-    
+
     private void setDelay() {
         this.delay = (int) (1000 / fps);
     }
@@ -80,9 +80,10 @@ public class StepAnimation extends AnimationDataSource {
             // ignored
         }
     }
-    
-    private void render(Node step, Instance instance){
+
+    private void render(Node step, Instance instance) {
         this.canvas.render(step, instance);
-    };
-    
+    }
+;
+
 }

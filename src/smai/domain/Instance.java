@@ -1,10 +1,10 @@
 package smai.domain;
 
 public class Instance {
-    
+
     private State initialState, finalState;
     private Operator[] operators;
-    
+
     public Instance() {
         this.initialState = null;
         this.finalState = null;
@@ -20,7 +20,7 @@ public class Instance {
     public boolean isFinalState(State state) {
         return state.equals(finalState);
     }
-    
+
     public State getInitialState() {
         return initialState;
     }
@@ -44,5 +44,5 @@ public class Instance {
     public void setOperators(Operator[] operators) {
         this.operators = operators;
     }
-    
+
 }
