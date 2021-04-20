@@ -24,6 +24,7 @@ import smai.data.searches.AStarSearchDataSource;
 import smai.data.searches.BestFirstSearchDataSource;
 import smai.data.searches.BreadthSearchDataSource;
 import smai.data.searches.DepthSearchDataSource;
+import smai.data.searches.HillClimbingSearchDataSource;
 import smai.domain.Heuristic;
 import smai.domain.SearchType;
 import smai.framework.hanoi.HanoiHeuristic;
@@ -44,6 +45,7 @@ public class Main extends javax.swing.JFrame implements Callback<Response>, Anim
 
     private final AStarSearchDataSource aStarSearchDataSource;
     private final BestFirstSearchDataSource bestFirstSearchDataSource;
+    private final HillClimbingSearchDataSource hillClimbingSearchDataSource;
 
     private final AnimationDataSource animatorDataSource;
     private final AnimationRepository animationRepository;
@@ -60,13 +62,14 @@ public class Main extends javax.swing.JFrame implements Callback<Response>, Anim
 
         depthSearchDataSource = new DepthSearchDataSource();
         breadthSearchDataSource = new BreadthSearchDataSource();
-        
+
         uninformedSearchesRepository = new UninformedSearchesRepository(depthSearchDataSource);
         resolveUninformedUseCase = new ResolveUninformedUseCase(uninformedSearchesRepository);
 
         aStarSearchDataSource = new AStarSearchDataSource();
         bestFirstSearchDataSource = new BestFirstSearchDataSource();
-        
+        hillClimbingSearchDataSource = new HillClimbingSearchDataSource();
+
         informedSearchesRepository = new InformedSearchesRepository(aStarSearchDataSource);
         resolveInformedUseCase = new ResolveInformedUseCase(informedSearchesRepository);
 
@@ -138,9 +141,13 @@ public class Main extends javax.swing.JFrame implements Callback<Response>, Anim
             case SearchMethods.A_STAR:
                 setInformedSearch(aStarSearchDataSource);
                 break;
-                
+
             case SearchMethods.BEST_FIRST:
                 setInformedSearch(bestFirstSearchDataSource);
+                break;
+
+            case SearchMethods.HILL_CLIMBING:
+                setInformedSearch(hillClimbingSearchDataSource);
                 break;
         }
     }
@@ -317,15 +324,20 @@ public class Main extends javax.swing.JFrame implements Callback<Response>, Anim
         enableLoader(false, StatusMessages.ON_STAND_BY);
 
         if (result == null) {
-            this.log("Something went grown, please try again.");
+            log("Something went grown, please try again.");
+            return;
+        }
+        
+        if (!result.hasSolution()) {
+            this.log("No solution found.");
             return;
         }
 
-        this.response = result;
-        this.log(response.toString());
+        response = result;
+        log(response.toString());
 
-        if (this.autoPlay) {
-            this.animateResponse();
+        if (autoPlay) {
+            animateResponse();
         }
     }
 

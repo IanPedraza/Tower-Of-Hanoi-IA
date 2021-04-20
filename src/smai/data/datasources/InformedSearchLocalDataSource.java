@@ -1,6 +1,5 @@
 package smai.data.datasources;
 
-import smai.common.utils.PathFinder;
 import smai.data.Callback;
 import smai.domain.Response;
 import smai.domain.Heuristic;

@@ -1,12 +1,12 @@
 package smai.domain;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 
 public abstract class State {
     public abstract State copy();
 
-    public final ArrayList<Successor> getSuccessors(Operator[] operators) {
-        ArrayList<Successor> successors = new ArrayList();
+    public final LinkedList<Successor> getSuccessors(Operator[] operators) {
+        LinkedList<Successor> successors = new LinkedList();
 
         for (Operator operator : operators) {
             Successor successor = operator.apply(this);
