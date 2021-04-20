@@ -16,8 +16,6 @@ public abstract class AnimationPanel extends JPanel {
         this.repaint();
     }
 
-    ;
-    
     @Override
     protected abstract void paintComponent(Graphics g);
 
