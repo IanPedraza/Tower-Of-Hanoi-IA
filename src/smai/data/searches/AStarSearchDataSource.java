@@ -40,8 +40,8 @@ public class AStarSearchDataSource extends InformedSearchLocalDataSource {
             closed.add(currentNode);
 
             if (instance.isFinalState(currentNode.getState())) {
-                response.setElapsedTime(TicToc.getInstance().toc());
                 response.setPath(PathFinder.getInstance().findPath(currentNode));
+                response.setElapsedTime(TicToc.getInstance().toc());
                 response.hasSolution(true);
                 response.setAnalyzedNodes(closed.size());
                 callback.onSuccess(response);

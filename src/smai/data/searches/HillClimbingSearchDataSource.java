@@ -29,8 +29,8 @@ public class HillClimbingSearchDataSource extends InformedSearchLocalDataSource 
             analyzedNodes++;
 
             if (instance.isFinalState(currentNode.getState())) {
-                response.setElapsedTime(TicToc.getInstance().toc());
                 response.setPath(PathFinder.getInstance().findPath(currentNode));
+                response.setElapsedTime(TicToc.getInstance().toc());
                 response.hasSolution(true);
                 response.setAnalyzedNodes(analyzedNodes);
                 callback.onSuccess(response);
