@@ -13,7 +13,6 @@ After solving the problem an animation it's played showing the results, in conso
 
 ![https://raw.githubusercontent.com/IanPedraza/ianpedraza.github.io/master/readme/ss_hanoi_towers.png](https://raw.githubusercontent.com/IanPedraza/ianpedraza.github.io/master/readme/ss_hanoi_towers.png)
 
----
 
 ## Developers
 
@@ -65,7 +64,6 @@ To finish the implementation just following the repository pattern used in main,
 
 You should replace the AnimationPanel shown in interface for your problem AnimationPanel
 
----
 
 ## Thanks
 
